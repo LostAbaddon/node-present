@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<title>该页找不到</title>
+<style>
+	html, body {
+		margin: 0px;
+		padding: 0px;
+		font-size: 36px;
+		font-weight: bold;
+		text-align: center;
+	}
+	#url {
+		font-size: 24px;
+		font-weight: normal;
+	}
+</style>
+</head>
+<body>
+<p>宝宝费尽全力也找不到下面这页，肿木办！！！</p>
+<p id="url"></p>
+<script>
+var query = {};
+location.search.replace(/^\?*/, '').split('&').map(q => {
+	q = q.split('=');
+	query[q[0]] = q[1];
+});
+document.querySelector('#url').innerHTML = query.path || "/";
+</script>
+</body>
+</html>

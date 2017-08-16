@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=yes,minimum-scale=1.0,maximum-scale=1.0" id="viewport" name="viewport">
+    <title>易通行 - 出行如意如易行</title>
+    <link href="http://ou3ahhxi7.bkt.clouddn.com/image/LOGO-32px.png" rel="shortcut icon" type="image/x-icon">
+    <link href="http://ou3ahhxi7.bkt.clouddn.com/image/LOGO-32px.png" rel="apple-touch-icon" sizes="60x60">
+    <link href="http://ou3ahhxi7.bkt.clouddn.com/image/LOGO-32px.png" rel="apple-touch-icon" sizes="76x76">
+    <link href="http://ou3ahhxi7.bkt.clouddn.com/image/LOGO-32px.png" rel="apple-touch-icon" sizes="120x120">
+    <link href="http://ou3ahhxi7.bkt.clouddn.com/image/LOGO-32px.png" rel="apple-touch-icon" sizes="152x152">
+    <link rel="stylesheet" type="text/css" href="http://ou3ahhxi7.bkt.clouddn.com/wifi/css/main.css" media="all">
+</head>
+<body>
+<div class="frame">
+    <div class="top"></div>
+    <div class="line line2"></div>
+    <div class="line line3"></div>
+    <div class="line line1"></div>
+    <div class="line line4"></div>
+    <div class="line line5"></div>
+    <div class="line line6"></div>
+    <div class="line button_area">
+        <a class="download_nav android" href="javascript:;" target="_blank">
+            <div class="left_area"></div>
+        </a>
+        <a class="download_nav ios" href="javascript:;" target="_blank">
+            <div class="right_area"></div>
+        </a>
+    </div>
+    <div class="line line7"></div>
+    <div class="logo"></div>
+    <div class="description">北京如易行科技有限公司</div>
+</div>
+<div class="mask">
+    <div class="content">
+        <div class="logo"></div>
+        <div class="title"></div>
+        <div class="company"></div>
+        <div class="desc"></div>
+    </div>
+</div>
+<script src="http://ou3ahhxi7.bkt.clouddn.com/js/jquery.min.js" type="text/javascript"></script>
+<script>
+    function resize() {
+        var body = document.body;
+        var size = body.getBoundingClientRect();
+        var desc = document.querySelector('.description');
+        var font = size.height / 60;
+        if (font < 12) font = 12;
+        desc.style.fontSize = font + 'px';
+        desc.style.lineHeight = font + 'px';
+    }
+
+    window.addEventListener('load', resize);
+    window.addEventListener('resize', resize);
+
+    var mask = $('div.mask');
+    $('a.download_nav').click(function () {
+        mask.css({display: 'block'});
+        setTimeout(function () {
+            mask.css({opacity: 1});
+        }, 100);
+    });
+    mask.click(function () {
+        mask.css({opacity: 0});
+        setTimeout(function () {
+            mask.css({display: 'none'});
+        }, 300);
+    });
+</script>
+</body>
+</html>

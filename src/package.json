@@ -1,0 +1,32 @@
+{
+  "author": {
+    "name": "LostAbaddon",
+    "email": "lostabaddon@gmail.com"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "express": "~4.15.4"
+  },
+  "deprecated": false,
+  "description": "Simple HTTP Server",
+  "engines": {
+    "node": ">= 8.3.0"
+  },
+  "keywords": [
+    "server",
+    "framework",
+    "web",
+    "rest",
+    "restful",
+    "router",
+    "app",
+    "api"
+  ],
+  "license": "MIT",
+  "name": "present",
+  "repository": {
+    "type": "git",
+    "url": "git+https://coding.net/lostabaddon/present.git"
+  },
+  "version": "0.0.1"
+}

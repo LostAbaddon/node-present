@@ -1,0 +1,393 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+}
+
+.frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.top {
+    position: absolute;
+    top: 0px;
+    bottom: 13%;
+    left: 0px;
+    right: 0px;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/1024');
+    background-position: center center;
+    background-size: cover;
+}
+
+.line {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.line1 {
+    bottom: 88.83%;
+    height: 2.40%;
+    min-height: 15px;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png');
+}
+
+.line2 {
+    top: 9.75%;
+    height: 14.09%;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png');
+}
+
+.line3 {
+    top: 21.215%;
+    height: 1.5%;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png');
+}
+
+.line4 {
+    top: 23.99%;
+    height: 3.00%;
+    min-height: 20px;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png');
+}
+
+.line5 {
+    top: 36.21%;
+    height: 14.24%;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line5.png?imageView2/2/h/200');
+}
+
+.line6 {
+    top: 60.67%;
+    height: 3.37%;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png');
+}
+
+.line7 {
+    top: 76.76%;
+    height: 3.97%;
+    min-height: 25px;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png');
+}
+
+.button_area {
+    top: 66.72%;
+    height: 7.80%;
+}
+
+.button_area .left_area {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 8%;
+    right: 54%;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/android.png?imageView2/2/w/400');
+    background-size: contain;
+    background-position: 100% center;
+    background-repeat: no-repeat;
+}
+
+.button_area .right_area {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 54%;
+    right: 8%;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/ios.png?imageView2/2/w/400');
+    background-size: contain;
+    background-position: 0% center;
+    background-repeat: no-repeat;
+}
+
+.logo {
+    position: absolute;
+    top: 88.8%;
+    bottom: 6.7%;
+    left: 0px;
+    right: 0px;
+    background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/logo.png');
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.description {
+    position: absolute;
+    top: 94.2%;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+    font-size: 0px;
+    font-family: PingFangSC-Regular;
+    color: rgb(51, 51, 51);
+    letter-spacing: 0;
+    line-height: 0px;
+}
+
+div.mask {
+    position: fixed;
+    display: none;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 9999;
+    background-color: rgba(51, 51, 51, 0.6);
+    opacity: 0;
+    transition: opacity ease-in-out 200ms;
+}
+
+div.mask div.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 520px;
+    height: 360px;
+    margin-top: -180px;
+    margin-left: -260px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 5px 15px rgba(51, 51, 51, 0.7);
+    color: rgb(51, 51, 51);
+    font-size: 36px;
+    line-height: 300px;
+    font-weight: bolder;
+    text-align: center;
+}
+
+div.mask div.content div {
+    position: absolute;
+    text-align: center;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+div.mask div.content div.logo {
+    top: 11.11%;
+    left: 50%;
+    width: 109px;
+    height: 109px;
+    margin-left: -54.5px;
+    background-image: url('./img/logo.png');
+    background-size: contain;
+}
+
+div.mask div.content div.title {
+    top: 48.44%;
+    left: 0px;
+    width: 100%;
+    height: 37px;
+    background-image: url('./img/title.png');
+    background-size: contain;
+}
+
+div.mask div.content div.company {
+    top: 62.44%;
+    left: 0px;
+    width: 100%;
+    height: 10.8px;
+    background-image: url('./img/company.png');
+    background-size: contain;
+}
+
+div.mask div.content div.desc {
+    bottom: 16.44%;
+    left: 0px;
+    width: 100%;
+    height: 30px;
+    background-image: url('./img/desc.png');
+    background-size: contain;
+}
+
+@media (max-width: 768px) {
+    div.mask div.content {
+        width: 260px;
+        height: 180px;
+        margin: -90px 0 0 -130px;
+    }
+
+    div.mask div.content div.logo {
+        top: 8%;
+        left: 50%;
+        width: 54.5px;
+        height: 54.5px;
+        margin-left: -27.25px;
+    }
+
+    div.mask div.content div.title {
+        top: 45.22%;
+        width: 100%;
+        height: 18.5px;
+    }
+
+    div.mask div.content div.company {
+        top: 60.44%;
+        height: 9px;
+    }
+
+    div.mask div.content div.desc {
+        bottom: 12.44%;
+        height: 16px;
+    }
+
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/768');
+    }
+    .button_area .left_area {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/android.png?imageView2/2/w/150');
+    }
+    .button_area .right_area {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/ios.png?imageView2/2/w/150');
+    }
+}
+@media (max-width: 560px) {
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/560');
+    }
+    .line1 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png?imageView2/2/w/560');
+    }
+    .line2 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png?imageView2/2/w/560');
+    }
+    .line3 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png?imageView2/2/w/560');
+    }
+    .line4 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png?imageView2/2/w/560');
+    }
+    .line5 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line5.png?imageView2/2/h/100');
+    }
+    .line6 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png?imageView2/2/w/560');
+    }
+    .line7 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png?imageView2/2/w/560');
+    }
+}
+@media (max-width: 480px) {
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/480');
+    }
+    .line1 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png?imageView2/2/w/480');
+    }
+    .line2 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png?imageView2/2/w/480');
+    }
+    .line3 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png?imageView2/2/w/480');
+    }
+    .line4 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png?imageView2/2/w/480');
+    }
+    .line6 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png?imageView2/2/w/480');
+    }
+    .line7 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png?imageView2/2/w/480');
+    }
+}
+@media (max-width: 440px) {
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/440');
+    }
+    .line1 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png?imageView2/2/w/440');
+    }
+    .line2 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png?imageView2/2/w/440');
+    }
+    .line3 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png?imageView2/2/w/440');
+    }
+    .line4 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png?imageView2/2/w/440');
+    }
+    .line6 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png?imageView2/2/w/440');
+    }
+    .line7 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png?imageView2/2/w/440');
+    }
+}
+@media (max-width: 400px) {
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/400');
+    }
+    .line1 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png?imageView2/2/w/400');
+    }
+    .line2 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png?imageView2/2/w/400');
+    }
+    .line3 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png?imageView2/2/w/400');
+    }
+    .line4 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png?imageView2/2/w/400');
+    }
+    .line6 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png?imageView2/2/w/400');
+    }
+    .line7 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png?imageView2/2/w/400');
+    }
+}
+@media (max-width: 360px) {
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/360');
+    }
+    .line1 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png?imageView2/2/w/360');
+    }
+    .line2 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png?imageView2/2/w/360');
+    }
+    .line3 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png?imageView2/2/w/360');
+    }
+    .line4 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png?imageView2/2/w/360');
+    }
+    .line6 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png?imageView2/2/w/360');
+    }
+    .line7 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png?imageView2/2/w/360');
+    }
+}
+@media (max-width: 320px) {
+    .top {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/bg.png?imageView2/2/w/320');
+    }
+    .line1 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line1.png?imageView2/2/w/320');
+    }
+    .line2 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line2.png?imageView2/2/w/320');
+    }
+    .line3 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line3.png?imageView2/2/w/320');
+    }
+    .line4 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line4.png?imageView2/2/w/320');
+    }
+    .line5 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line5.png?imageView2/2/h/80');
+    }
+    .line6 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line6.png?imageView2/2/w/320');
+    }
+    .line7 {
+        background-image: url('http://ou3ahhxi7.bkt.clouddn.com/wifi/image/line7.png?imageView2/2/w/320');
+    }
+}

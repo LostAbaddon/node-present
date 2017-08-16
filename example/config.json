@@ -1,0 +1,10 @@
+{
+	"loglev": 0,
+	"port": 8080,
+	"root": [ "./web", "./" ],
+	"download": [ "./download", "./dl" ],
+	"forbid": [ "web" ],
+	"redirect": {
+		"search": "http://www.google.com/search"
+	}
+}
