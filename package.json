@@ -26,7 +26,7 @@
   "name": "present",
   "repository": {
     "type": "git",
-    "url": "git+https://coding.net/lostabaddon/present.git"
+    "url": "git+https://git.coding.net/lostabaddon/node-present.git"
   },
   "version": "0.0.1"
 }

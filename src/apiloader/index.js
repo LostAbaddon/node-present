@@ -67,9 +67,7 @@ const loadHandler = (pathlist, app) => {
 			var params = {};
 			Object.assign(params, req.query, req.params);
 			console.log('>>>>>>>>>>>>>>>>');
-			console.log(req.body);
-			console.log(req.param('name'));
-			// for (let key in req) console.log(key);
+			console.log(req);
 			console.log('<<<<<<<<<<<<<<<<');
 			var result = handler(req.method, params, {});
 			if (result === null || result === undefined) next();
