@@ -1,10 +1,18 @@
+/**
+ * Name:	API Loader
+ * Desc:    Load api
+ * Author:	LostAbaddon
+ * Version:	0.0.1
+ * Date:	2017.08.16
+ */
+
 const FS = require('fs');
 const Express = require('express');
 const BodyParser = require('body-parser');
 
 const multer = require('multer')().array();
 const jsonParser = BodyParser.json();
-const rawParser = BodyParser.raw();
+const textParser = BodyParser.text({ 'defaultCharset': 'utf-8' });
 const urlEncodingParser = BodyParser.urlencoded({ extended: false });
 
 const dealFilePath = (path, root, url) => {
@@ -73,9 +81,25 @@ const loadHandler = (pathlist, app) => {
 			multer,
 			urlEncodingParser,
 			jsonParser,
+			textParser,
 			(req, res, next) => {
 				var params = {};
+				if (req.body instanceof String || typeof req.body === 'string') {
+					let content;
+					try {
+						content = JSON.parse(req.body);
+					}
+					catch (err) {
+						content = req.body;
+					}
+					req.body = { data: content };
+				}
+				else if (req.body instanceof Array || (!!req.body.map && !!req.body.some)) {
+					req.body = { data: req.body };
+				}
+				console.log(req.body);
 				Object.assign(params, req.body, req.params, req.query);
+				console.log(params);
 				var result = handler(req.method, params, {});
 				if (result === null || result === undefined) next();
 				else res.json(result);
