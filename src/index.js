@@ -6,6 +6,8 @@
  * Date:	2017.08.16
  */
 
+require('./core.js');
+
 const Path = require('path');
 const Express = require('express');
 const Css = require('./cachedStaticServer');
@@ -33,31 +35,6 @@ const pathUrlize = path => {
 	if (!urlpath.match(/^\//)) urlpath = '/' + urlpath;
 	return urlpath;
 };
-const stringNormalize = (str, len, padding) => {
-	str = str.toString();
-	padding = padding || ' ';
-	len = len || 0;
-	var l = str.length;
-	for (let i = l; i < len; i ++) str = padding + str;
-	return str;
-};
-const timeNormalize = time => {
-	time = time || new Date();
-	var Y = time.getYear() + 1900;
-	var M = time.getMonth() + 1;
-	var D = time.getDate();
-	var h = time.getHours();
-	var m = time.getMinutes();
-	var s = time.getSeconds();
-	var ms = time.getMilliseconds();
-	return stringNormalize(Y, 4, '0')
-		+ '/' + stringNormalize(M, 2, '0')
-		+ '/' + stringNormalize(D, 2, '0')
-		+ ' ' + stringNormalize(h, 2, '0')
-		+ ':' + stringNormalize(m, 2, '0')
-		+ ':' + stringNormalize(s, 2, '0')
-		+ '.' + stringNormalize(ms, 2, '0')
-};
 
 const server = config => {
 	config.loglev = config.loglev || 1; // 1: info; 2: log; 3: warn; 4: error
@@ -79,10 +56,11 @@ const server = config => {
 		}
 	};
 
-	var info = function () { if (config.loglev <= 1) {[].unshift.call(arguments, '[INFO  (' + timeNormalize() + ')]'); console.info.apply(console, arguments)} };
-	var log = function () { if (config.loglev <= 2) {[].unshift.call(arguments, '[LOG   (' + timeNormalize() + ')]'); console.log.apply(console, arguments)} };
-	var warn = function () { if (config.loglev <= 3) {[].unshift.call(arguments, '[WARN  (' + timeNormalize() + ')]'); console.warn.apply(console, arguments)} };
-	var error = function () { if (config.loglev <= 4) {[].unshift.call(arguments, '[ERROR (' + timeNormalize() + ')]'); console.error.apply(console, arguments)} };
+	var logger = global.logger(config.loglev);
+	var info = logger.info;
+	var log = logger.log;
+	var warn = logger.warn;
+	var error = logger.error;
 
 	var app = Express();
 	// WebAPI
@@ -115,6 +93,8 @@ const server = config => {
 			});
 		});
 	});
+	// Upload Folder
+	
 	// Static Folder
 	config.root.map(path => app.use(Css(path)));
 	// 404

@@ -97,9 +97,7 @@ const loadHandler = (pathlist, app) => {
 				else if (req.body instanceof Array || (!!req.body.map && !!req.body.some)) {
 					req.body = { data: req.body };
 				}
-				console.log(req.body);
 				Object.assign(params, req.body, req.params, req.query);
-				console.log(params);
 				var result = handler(req.method, params, {});
 				if (result === null || result === undefined) next();
 				else res.json(result);

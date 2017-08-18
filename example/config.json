@@ -6,5 +6,6 @@
 	"forbid": [ "web" ],
 	"redirect": {
 		"search": "http://www.google.com/search"
-	}
+	},
+	"upload": "./upload"
 }
