@@ -1,7 +1,13 @@
 const FS = require('fs');
 const Express = require('express');
+const BodyParser = require('body-parser');
 
-const dealFilePaht = (path, root, url) => {
+const multer = require('multer')().array();
+const jsonParser = BodyParser.json();
+const rawParser = BodyParser.raw();
+const urlEncodingParser = BodyParser.urlencoded({ extended: false });
+
+const dealFilePath = (path, root, url) => {
 	path = url + path.replace(root, '');
 	if (path.substring(path.length - 5, path.length) === '/_.js') {
 		path = path.substring(0, path.length - 5);
@@ -17,7 +23,7 @@ const mountHandler = (path, root, url, handlers) => {
 	catch (err) {
 		return;
 	}
-	var url = dealFilePaht(path, root, url);
+	var url = dealFilePath(path, root, url);
 	handlers[url] = handler;
 };
 const searchFolder = (folder, root, url, handlers) => {
@@ -63,16 +69,18 @@ const loadHandler = (pathlist, app) => {
 	});
 	Object.keys(handlers).map(path => {
 		var handler = handlers[path];
-		app.use(path, (req, res, next) => {
-			var params = {};
-			Object.assign(params, req.query, req.params);
-			console.log('>>>>>>>>>>>>>>>>');
-			console.log(req);
-			console.log('<<<<<<<<<<<<<<<<');
-			var result = handler(req.method, params, {});
-			if (result === null || result === undefined) next();
-			else res.json(result);
-		});
+		app.use(path,
+			multer,
+			urlEncodingParser,
+			jsonParser,
+			(req, res, next) => {
+				var params = {};
+				Object.assign(params, req.body, req.params, req.query);
+				var result = handler(req.method, params, {});
+				if (result === null || result === undefined) next();
+				else res.json(result);
+			}
+		);
 	});
 };
 

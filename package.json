@@ -1,32 +1,34 @@
 {
-  "author": {
-    "name": "LostAbaddon",
-    "email": "lostabaddon@gmail.com"
-  },
-  "bundleDependencies": false,
-  "dependencies": {
-    "express": "~4.15.4"
-  },
-  "deprecated": false,
-  "description": "Simple HTTP Server",
-  "engines": {
-    "node": ">= 8.3.0"
-  },
-  "keywords": [
-    "server",
-    "framework",
-    "web",
-    "rest",
-    "restful",
-    "router",
-    "app",
-    "api"
-  ],
-  "license": "MIT",
-  "name": "present",
-  "repository": {
-    "type": "git",
-    "url": "git+https://git.coding.net/lostabaddon/node-present.git"
-  },
-  "version": "0.0.1"
+	"author": {
+		"name": "LostAbaddon",
+		"email": "lostabaddon@gmail.com"
+	},
+	"bundleDependencies": false,
+	"dependencies": {
+		"express": "~4.15.4",
+		"multer": "~1.3.0",
+		"body-parser": "~1.17.2"
+	},
+	"deprecated": false,
+	"description": "Simple Web Server",
+	"engines": {
+		"node": ">= 8.3.0"
+	},
+	"keywords": [
+		"server",
+		"framework",
+		"web",
+		"rest",
+		"restful",
+		"router",
+		"app",
+		"api"
+	],
+	"license": "MIT",
+	"name": "present",
+	"repository": {
+		"type": "git",
+		"url": "git+https://git.coding.net/lostabaddon/node-present.git"
+	},
+	"version": "0.0.1"
 }
