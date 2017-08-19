@@ -38,6 +38,7 @@ Date: 2017.08.19
 	>	访问指定路径会自动重定向到指定网址，带上所有参数（get请求）
 8.	访问优先级： Api > Forbid > Redirect > Download > Static > 404
 9.	示例：
+
 ```json
 {
 	"loglev": 1,
@@ -62,6 +63,15 @@ Date: 2017.08.19
 };
 
 ```
+
+----
+
+v0.0.2
+----
+Date: 2017.08.20
+
+1.	WebAPI由同步改为异步，增加可拓展性
+2.	当配置了upload时，默认将upload目录添加为forbid目录
 
 ----
 
