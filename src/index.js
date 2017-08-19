@@ -1,17 +1,15 @@
 /**
  * Name:	Simple Server
- * Desc:    A static web server, one can set the resource download folder, forbidden folder and WebAPI interface.
+ * Desc:    简易服务器，通过配置文件实现静态资源获取、下载、上传、跳转以及WebAPI接口
  * Author:	LostAbaddon
  * Version:	0.0.1
- * Date:	2017.08.16
+ * Date:	2017.08.19
  */
 
-require('./core.js');
+require('./core');
 
 const Path = require('path');
 const Express = require('express');
-const Css = require('./cachedStaticServer');
-const Loader = require('./apiloader');
 
 const Root = process.cwd();
 
@@ -36,15 +34,25 @@ const pathUrlize = path => {
 	return urlpath;
 };
 
+const DefaultConfig = {
+	loglev: 1,
+	port: ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod') ? 80 : 8080),
+	api: ['./api'],
+	forbid: [],
+	redirect: {},
+	download: ['./download'],
+	root: ['./'],
+	error: {}
+};
+const DefaultUploadConfig = {
+	"destination": "./upload",
+	"keepname": false,
+	"timely": false
+};
 const server = config => {
-	config.loglev = config.loglev || 1; // 1: info; 2: log; 3: warn; 4: error
-	config.port = config.port || 80;
-	config.root = pathNormalize(config.root || [ "./" ]);
-	config.download = config.download || [ "./download" ];
-	config.api = (config.api || [ "./api" ]).map(path => [pathUrlize(path), pathNormalize(path)]);
-	config.forbid = config.forbid || [];
-	config.redirect = config.redirect || {};
-	config.error = config.error || {};
+	config = Object.assign(DefaultConfig, config);
+	config.root = pathNormalize(config.root);
+	config.api = config.api.map(path => [pathUrlize(path), pathNormalize(path)]);
 	config.error["404"] = config.error["404"] || function (req, res) {
 		error('No Such Page: ' + req.path);
 		if (req.path === '/error/404.html') {
@@ -63,13 +71,16 @@ const server = config => {
 	var error = logger.error;
 
 	var app = Express();
+
 	// WebAPI
-	Loader(config.api, app);
+	require('./apiloader')(app, config.api);
+
 	// Forbidden Path
 	config.forbid.map(path => {
 		var urlpath = pathUrlize(path);
 		app.use(urlpath, config.error["404"]);
 	});
+
 	// Redirect
 	for (let path in config.redirect) {
 		let urlpath = pathUrlize(path);
@@ -83,6 +94,7 @@ const server = config => {
 			res.redirect(url);
 		});
 	}
+
 	// Download Folder
 	config.download.map(path => {
 		var dlpath = pathNormalize(path);
@@ -93,10 +105,18 @@ const server = config => {
 			});
 		});
 	});
+
 	// Upload Folder
+	if (!!config.upload) {
+		config.upload = Object.assign(DefaultUploadConfig, config.upload);
+		config.upload.classify = Object.assign(DefaultUploadConfig.classify, config.upload.classify);
+		config.upload.url = config.upload.url || pathUrlize(config.upload.destination);
+		require('./uploader')(app, config.upload, config.callbacks.upload);
+	}
 	
 	// Static Folder
-	config.root.map(path => app.use(Css(path)));
+	config.root.map(path => app.use(require('./cachedStaticServer')(path)));
+
 	// 404
 	app.use(config.error["404"]);
 

@@ -1,6 +1,6 @@
 /**
  * Name:	API Loader
- * Desc:    Load api
+ * Desc:    自动加载API指定目录下的文件，作为WebAPI接口
  * Author:	LostAbaddon
  * Version:	0.0.1
  * Date:	2017.08.16
@@ -70,7 +70,7 @@ const searchFolder = (folder, root, url, handlers) => {
 		}
 	});
 };
-const loadHandler = (pathlist, app) => {
+const loadHandler = (app, pathlist) => {
 	var handlers = {};
 	pathlist.map(p => {
 		searchFolder(p[1], p[1], p[0], handlers);

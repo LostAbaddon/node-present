@@ -5,8 +5,37 @@
 </head>
 <body>
 <a href="../index.html"><button>BiuBiuBiu~~~</button></a>
-<script src="./api/test.js?a=b"></script>
+<script src="./js/jquery.min.js"></script>
+<div>
+	<input type="text" name="t1">
+	<input type="text" name="t2">
+	<input type="file" name="f1">
+	<input type="file" name="f2">
+	<button id="submit">submit</button>
+</div>
+<script>
+$('#submit').click(() => {
+	var form_data = new FormData();
+	var file1 = $('input[name="f1"]').prop("files")[0];
+	var file2 = $('input[name="f2"]').prop("files")[0];
+	form_data.append("f1", file1);
+	form_data.append("f2", file2);
+	$.ajax({
+		type: "POST", // 上传文件要用POST
+		url: "./upload",
+		dataType : "json",
+		processData: false,  // 注意：不要 process data
+		contentType: false,  // 注意：不设置 contentType
+		data: form_data
+	}).success(function(msg) {
+		console.log(msg);
+	}).fail(function(msg) {
+		console.log(msg);
+	});
+});
+</script>
+<!-- <script src="./api/test.js?a=b"></script>
 <script src="./api/3?x=4"></script>
-<script src="./api/3/a.js?id=7"></script>
+<script src="./api/3/a.js?id=7"></script> -->
 </body>
 </html>

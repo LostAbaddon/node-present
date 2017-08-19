@@ -1,3 +1,17 @@
+/**
+ * Name:	Simple Web Server Entry
+ * Desc:    简易服务器入口，自动获取参数文件并提供快捷的设置回调的入口
+ * Author:	LostAbaddon
+ * Version:	0.0.1
+ * Date:	2017.08.19
+ *
+ * config:
+ * 		destination		保存的根路径
+ * 		keeyname		是否保存原文件名
+ * 		timely			是否追加时间信息，false不加，'folder'在分类路径下以时间为次目录，'postfix'在文件名后加时间为标记
+ * 		classify		分类器，key是文件类型，value是分类目录
+ */
+
 const FS = require('fs');
 
 const present = require('./src');
@@ -17,6 +31,10 @@ const server = config => {
 	var server = {
 		onUpload: cb => {
 			if (cb instanceof Function || typeof cb === 'function') cbs.upload = cb;
+			return server;
+		},
+		onError: cb => {
+			cbs.error = cb;
 			return server;
 		}
 	};
