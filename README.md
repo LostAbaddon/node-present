@@ -25,6 +25,7 @@ Date: 2017.08.19
 3.	资源上传
 	>	上传文件到指定目录，可根据配置选择是否按日期分目录，或在文件名上加日期后缀，或者根据自建的文件类型筛选器分目录，以及可以使用32位随机字符串作为文件名。
 		destination: 保存的根路径；
+		url: 请求上传的根路径；
 		keepname: 是否保存原文件名；
 		timely: 是否追加时间信息，false不加，'folder'在分类路径下以时间为次目录，'postfix'在文件名后加时间为标记；
 		classify: 分类器，key是文件类型，value是分类目录。
@@ -38,12 +39,46 @@ Date: 2017.08.19
 7.	重定向
 	>	访问指定路径会自动重定向到指定网址，带上所有参数
 8.	访问优先级： Api > Forbid > Redirect > Download > Static > 404
+9.	示例：
+
+```json
+{
+	"loglev": 1,
+	"port": 80,
+	"api": [ "./api" ],
+	"forbid": [ "./upload" ],
+	"redirect": {
+		"search": "http://www.google.com/search"
+	},
+	"download": [ "./download", "./dl" ],
+	"root": [ "./", "./web" ],
+	"error": {},
+	"upload": {
+		"destination": "./upload",
+		"keepname": true,
+		"timely": "postfix",
+		"classify": {
+			"image": "img/",
+			"text": "text/"
+		}
+	}
+};
+
+```
 
 ----
 
-v0.0.2（开发中）
+v0.0.2
 ----
-Date: 2017.08.19
+Date: 2017.08.20
+
+1.	WebAPI由同步改为异步，增加可拓展性
+2.	当配置了upload时，默认将upload目录添加为forbid目录
+
+----
+
+v0.1.0（开发中）
+----
 
 1.	内存级缓存（开发中）
 2.	热更新插件（开发中）

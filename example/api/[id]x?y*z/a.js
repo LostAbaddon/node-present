@@ -3,8 +3,8 @@ var result = {
 	"aloha": "kosmos"
 };
 
-var handler = (method, params, session) => {
-	return result;
+var handler = (method, params, session, callback) => {
+	callback(result);
 };
 
 module.exports = handler;
