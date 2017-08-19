@@ -37,7 +37,7 @@ const pathUrlize = path => {
 const DefaultConfig = {
 	loglev: 1,
 	port: ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod') ? 80 : 8080),
-	api: ['./api'],
+	api: [ './api' ],
 	forbid: [],
 	redirect: {},
 	download: ['./download'],
@@ -108,6 +108,7 @@ const server = config => {
 
 	// Upload Folder
 	if (!!config.upload) {
+		if (config.forbid.length === 0) config.forbid.push(config.upload.destination);
 		config.upload = Object.assign(DefaultUploadConfig, config.upload);
 		config.upload.classify = Object.assign(DefaultUploadConfig.classify, config.upload.classify);
 		config.upload.url = config.upload.url || pathUrlize(config.upload.destination);

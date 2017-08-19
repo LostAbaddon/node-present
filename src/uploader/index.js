@@ -7,6 +7,7 @@
  *
  * config:
  * 		destination		保存的根路径
+ * 		url				调用上传请求的URL根路径
  * 		keepname		是否保存原文件名
  * 		timely			是否追加时间信息，false不加，'folder'在分类路径下以时间为次目录，'postfix'在文件名后加时间为标记
  * 		classify		分类器，key是文件类型，value是分类目录
