@@ -98,9 +98,10 @@ const loadHandler = (app, pathlist) => {
 					req.body = { data: req.body };
 				}
 				Object.assign(params, req.body, req.params, req.query);
-				var result = handler(req.method, params, {});
-				if (result === null || result === undefined) next();
-				else res.json(result);
+				handler(req.method, params, {}, result => {
+					if (result === null || result === undefined) next();
+					else res.json(result);
+				});
 			}
 		);
 	});
