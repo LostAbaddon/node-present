@@ -4,12 +4,13 @@
 ----
 
 -	Module: Present
--	Version: 0.0.1
+-	Version: 0.0.2
 -	Author: LostAbaddon
+-	Date: 2017.08.19
 
 简易HTTP服务器。
-基于 NodeJS 8.3 、 Express 4.15 、 Multer 1.3 、 body-parser 1.17 。
-文档化路径化管理与加载静态资源、下载与上传请求、WebAPI接口。
+基于 NodeJS 8.3 、 Express 4.15 、Mime 1.3.4 、 Multer 1.3 、 body-parser 1.17 。
+文档化路径化管理与加载静态资源、下载与上传请求、可热更新的单线程/多线程/多进程模式WebAPI接口，Router插件，资源单包化。
 
 ----
 
