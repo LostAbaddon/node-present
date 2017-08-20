@@ -4,9 +4,9 @@
 ----
 
 -	Module: Present
--	Version: 0.0.2
+-	Version: 0.1.0
 -	Author: LostAbaddon
--	Date: 2017.08.19
+-	Date: 2017.08.20
 
 简易HTTP服务器。
 基于 NodeJS 8.3 、 Express 4.15 、Mime 1.3.4 、 Multer 1.3 、 Body-Parser 1.17 。
@@ -81,13 +81,14 @@ v0.1.0（开发中）
 ----
 
 1.	内存级缓存（开发中）
-2.	热更新插件（开发中）
-3.	插件系统（开发中）
-4.	WebAPI的多Mode运行：主线程、子线程、子进程（开发中）
+2.	WebAPI的多Mode运行：主线程、子线程、子进程（开发中）
+3.	热更新插件（开发中）
+4.	插件系统（开发中）
 5.	优化session（开发中）
 6.	过滤器（开发中）
 7.	单包化资源（开发中）
 8.	模板系统（开发中）
+9.	WebSocket用的WebAPI（开发中）
 
 ----
 
