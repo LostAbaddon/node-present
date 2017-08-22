@@ -6,27 +6,28 @@
  * MIT Licensed
  */
 
-'use strict'
+'use strict';
 
 /**
  * Module dependencies.
  * @private
  */
 
-var encodeUrl = require('encodeurl')
-var escapeHtml = require('escape-html')
-var parseUrl = require('parseurl')
-var resolve = require('path').resolve
-var url = require('url')
-var send = require('./sender')
+var encodeUrl = require('encodeurl');
+var escapeHtml = require('escape-html');
+var parseUrl = require('parseurl');
+var resolve = require('path').resolve;
+var url = require('url');
+var send = require('./sender');
+var CacheManager = require('./cacheManager');
 
 /**
  * Module exports.
  * @public
  */
 
-module.exports = serveStatic
-module.exports.mime = send.mime
+module.exports = serveStatic;
+module.exports.mime = send.mime;
 
 /**
  * @param {string} root
@@ -36,94 +37,97 @@ module.exports.mime = send.mime
  */
 
 function serveStatic (root, options) {
-  if (!root) {
-    throw new TypeError('root path required')
-  }
+	if (!root) {
+		throw new TypeError('root path required');
+	}
 
-  if (typeof root !== 'string') {
-    throw new TypeError('root path must be a string')
-  }
+	if (typeof root !== 'string') {
+		throw new TypeError('root path must be a string');
+	}
 
-  // copy options object
-  var opts = Object.create(options || null)
+	// copy options object
+	var opts = Object.create(options || null);
 
-  // fall-though
-  var fallthrough = opts.fallthrough !== false
+	// fall-though
+	var fallthrough = opts.fallthrough !== false;
 
-  // default redirect
-  var redirect = opts.redirect !== false
+	// default redirect
+	var redirect = opts.redirect !== false;
 
-  // headers listener
-  var setHeaders = opts.setHeaders
+	// headers listener
+	var setHeaders = opts.setHeaders;
 
-  if (setHeaders && typeof setHeaders !== 'function') {
-    throw new TypeError('option setHeaders must be function')
-  }
+	if (setHeaders && typeof setHeaders !== 'function') {
+		throw new TypeError('option setHeaders must be function');
+	}
 
-  // setup options for send
-  opts.maxage = opts.maxage || opts.maxAge || 0
-  opts.root = resolve(root)
+	// setup options for send
+	opts.maxage = opts.maxage || opts.maxAge || 0;
+	opts.root = resolve(root);
 
-  // construct directory listener
-  var onDirectory = redirect
-    ? createRedirectDirectoryListener()
-    : createNotFoundDirectoryListener()
+	// construct directory listener
+	var onDirectory = redirect
+		? createRedirectDirectoryListener()
+		: createNotFoundDirectoryListener();
 
-  return function serveStatic (req, res, next) {
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-      if (fallthrough) {
-        return next()
-      }
+	// CacheManager
+	var cacheManager = (options || {}).cache || new CacheManager();
 
-      // method not allowed
-      res.statusCode = 405
-      res.setHeader('Allow', 'GET, HEAD')
-      res.setHeader('Content-Length', '0')
-      res.end()
-      return
-    }
+	return function serveStatic (req, res, next) {
+		if (req.method !== 'GET' && req.method !== 'HEAD') {
+			if (fallthrough) {
+				return next();
+			}
 
-    var forwardError = !fallthrough
-    var originalUrl = parseUrl.original(req)
-    var path = parseUrl(req).pathname
+			// method not allowed
+			res.statusCode = 405;
+			res.setHeader('Allow', 'GET, HEAD');
+			res.setHeader('Content-Length', '0');
+			res.end();
+			return;
+		}
 
-    // make sure redirect occurs at mount
-    if (path === '/' && originalUrl.pathname.substr(-1) !== '/') {
-      path = ''
-    }
+		var forwardError = !fallthrough;
+		var originalUrl = parseUrl.original(req);
+		var path = parseUrl(req).pathname;
 
-    // create send stream
-    var stream = send(req, path, opts)
+		// make sure redirect occurs at mount
+		if (path === '/' && originalUrl.pathname.substr(-1) !== '/') {
+			path = '';
+		}
 
-    // add directory handler
-    stream.on('directory', onDirectory)
+		// create send stream
+		var stream = send(req, path, opts);
 
-    // add headers listener
-    if (setHeaders) {
-      stream.on('headers', setHeaders)
-    }
+		// add directory handler
+		stream.on('directory', onDirectory);
 
-    // add file listener for fallthrough
-    if (fallthrough) {
-      stream.on('file', function onFile () {
-        // once file is determined, always forward error
-        forwardError = true
-      })
-    }
+		// add headers listener
+		if (setHeaders) {
+			stream.on('headers', setHeaders);
+		}
 
-    // forward errors
-    stream.on('error', function error (err) {
-      if (forwardError || !(err.statusCode < 500)) {
-        next(err)
-        return
-      }
+		// add file listener for fallthrough
+		if (fallthrough) {
+			stream.on('file', function onFile () {
+				// once file is determined, always forward error
+				forwardError = true;
+			});
+		}
 
-      next()
-    })
+		// forward errors
+		stream.on('error', function error (err) {
+			if (forwardError || !(err.statusCode < 500)) {
+				next(err);
+				return
+			}
 
-    // pipe
-    stream.pipe(res)
-  }
+			next();
+		});
+
+		// pipe
+		stream.pipe(res, cacheManager);
+	}
 }
 
 /**
@@ -131,18 +135,18 @@ function serveStatic (root, options) {
  * @private
  */
 function collapseLeadingSlashes (str) {
-  for (var i = 0; i < str.length; i++) {
-    if (str[i] !== '/') {
-      break
-    }
-  }
+	for (var i = 0; i < str.length; i++) {
+		if (str[i] !== '/') {
+			break;
+		}
+	}
 
-  return i > 1
-    ? '/' + str.substr(i)
-    : str
+	return i > 1
+		? '/' + str.substr(i)
+		: str;
 }
 
- /**
+/**
  * Create a minimal HTML document.
  *
  * @param {string} title
@@ -151,15 +155,15 @@ function collapseLeadingSlashes (str) {
  */
 
 function createHtmlDocument (title, body) {
-  return '<!DOCTYPE html>\n' +
-    '<html lang="en">\n' +
-    '<head>\n' +
-    '<meta charset="utf-8">\n' +
-    '<title>' + title + '</title>\n' +
-    '</head>\n' +
-    '<body>\n' +
-    '<pre>' + body + '</pre>\n' +
-    '</body>\n'
+	return '<!DOCTYPE html>\n' +
+		'<html lang="en">\n' +
+		'<head>\n' +
+		'<meta charset="utf-8">\n' +
+		'<title>' + title + '</title>\n' +
+		'</head>\n' +
+		'<body>\n' +
+		'<pre>' + body + '</pre>\n' +
+		'</body>\n';
 }
 
 /**
@@ -168,9 +172,9 @@ function createHtmlDocument (title, body) {
  */
 
 function createNotFoundDirectoryListener () {
-  return function notFound () {
-    this.error(404)
-  }
+	return function notFound () {
+		this.error(404);
+	}
 }
 
 /**
@@ -179,31 +183,31 @@ function createNotFoundDirectoryListener () {
  */
 
 function createRedirectDirectoryListener () {
-  return function redirect (res) {
-    if (this.hasTrailingSlash()) {
-      this.error(404)
-      return
-    }
+	return function redirect (res) {
+		if (this.hasTrailingSlash()) {
+			this.error(404);
+			return;
+		}
 
-    // get original URL
-    var originalUrl = parseUrl.original(this.req)
+		// get original URL
+		var originalUrl = parseUrl.original(this.req);
 
-    // append trailing slash
-    originalUrl.path = null
-    originalUrl.pathname = collapseLeadingSlashes(originalUrl.pathname + '/')
+		// append trailing slash
+		originalUrl.path = null;
+		originalUrl.pathname = collapseLeadingSlashes(originalUrl.pathname + '/');
 
-    // reformat the URL
-    var loc = encodeUrl(url.format(originalUrl))
-    var doc = createHtmlDocument('Redirecting', 'Redirecting to <a href="' + escapeHtml(loc) + '">' +
-      escapeHtml(loc) + '</a>')
+		// reformat the URL
+		var loc = encodeUrl(url.format(originalUrl));
+		var doc = createHtmlDocument('Redirecting', 'Redirecting to <a href="' + escapeHtml(loc) + '">' +
+			escapeHtml(loc) + '</a>');
 
-    // send redirect response
-    res.statusCode = 301
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8')
-    res.setHeader('Content-Length', Buffer.byteLength(doc))
-    res.setHeader('Content-Security-Policy', "default-src 'self'")
-    res.setHeader('X-Content-Type-Options', 'nosniff')
-    res.setHeader('Location', loc)
-    res.end(doc)
-  }
+		// send redirect response
+		res.statusCode = 301;
+		res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+		res.setHeader('Content-Length', Buffer.byteLength(doc));
+		res.setHeader('Content-Security-Policy', "default-src 'self'");
+		res.setHeader('X-Content-Type-Options', 'nosniff');
+		res.setHeader('Location', loc);
+		res.end(doc);
+	}
 }

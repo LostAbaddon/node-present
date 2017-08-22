@@ -72,6 +72,11 @@ const server = config => {
 
 	var app = Express();
 
+	if (app.enabled('x-powered-by')) app.use((req, res, next) => {
+		res.setHeader('X-Powered-By', 'Present');
+		next();
+	});
+
 	// WebAPI
 	require('./apiloader')(app, config.api);
 
@@ -121,6 +126,7 @@ const server = config => {
 	// 404
 	app.use(config.error["404"]);
 
+	app.config = config;
 	app.listen(config.port);
 
 	log('Server Started...');

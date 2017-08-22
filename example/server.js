@@ -4,5 +4,6 @@ Present('./config.json').onUpload((success, req, res, next) => {
 	console.log('Upload!!!');
 	console.log(success);
 	console.log(req.files);
-	res.send("Aloha Kosmos!!!");
+	if (success) res.send("Aloha Kosmos!!!");
+	else res.send("Holy Hell~~~");
 });
