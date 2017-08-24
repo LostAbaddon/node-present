@@ -10,6 +10,8 @@ require('./core');
 
 const Path = require('path');
 const Express = require('express');
+const CacheedStaticServer = require('./cachedStaticServer')
+const CacheManager = CacheedStaticServer.CacheManager;
 
 const Root = process.cwd();
 
@@ -42,15 +44,24 @@ const DefaultConfig = {
 	redirect: {},
 	download: ['./download'],
 	root: ['./'],
-	error: {}
+	error: {},
+	cache: {}
 };
 const DefaultUploadConfig = {
 	"destination": "./upload",
 	"keepname": false,
 	"timely": false
 };
+const DefaultCacheConfig = {
+	prefix: "Resource::",
+	mem: {
+		totalLimit: "10M",
+		singleLimit: "1M",
+		accept: [ 'json', 'js', 'text' ]
+	}
+};
 const server = config => {
-	config = Object.assign(DefaultConfig, config);
+	config.extent(DefaultConfig);
 	config.root = pathNormalize(config.root);
 	config.api = config.api.map(path => [pathUrlize(path), pathNormalize(path)]);
 	config.error["404"] = config.error["404"] || function (req, res) {
@@ -63,6 +74,9 @@ const server = config => {
 			res.redirect(404, '/error/404.html?path=' + req.path);
 		}
 	};
+	config.cache = config.cache || {};
+	config.cache.extent(DefaultCacheConfig);
+	config.cache.mem.extent(DefaultCacheConfig.mem);
 
 	var logger = global.logger(config.loglev);
 	var info = logger.info;
@@ -120,8 +134,12 @@ const server = config => {
 		require('./uploader')(app, config.upload, config.callbacks.upload);
 	}
 	
+	// CacheManager
+	var cacheManager = new CacheManager(config.cache);
 	// Static Folder
-	config.root.map(path => app.use(require('./cachedStaticServer')(path)));
+	config.root.map(path => app.use(CacheedStaticServer(path, {
+		cache: cacheManager
+	})));
 
 	// 404
 	app.use(config.error["404"]);

@@ -832,7 +832,6 @@ SendStream.prototype.stream = async function stream (path, options, key, cache, 
 	// end
 	.on('end', () => {
 		self.emit('end');
-		console.log('VVVVVVVVV');
 		cacheManager.save(key, cache);
 	})
 

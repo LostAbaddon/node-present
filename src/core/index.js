@@ -2,14 +2,15 @@
  * Name:	Common Core
  * Desc:    辅助工具
  * Author:	LostAbaddon
- * Version:	0.0.1
- * Date:	2017.08.19
+ * Version:	0.0.2
+ * Date:	2017.08.24
  *
  * 热更新require库
  * 字符串拓展、随机穿
  * 日志工具
  * 文件夹生成
  * 辅助工具
+ * Object的copy与extent功能
  */
 
 const FS = require('fs');
@@ -175,3 +176,17 @@ global.Utils.preparePathSync = path => {
 		return false;
 	}
 };
+
+Object.prototype.copy = function () {
+	return Object.assign({}, this);
+}
+Object.prototype.extent = function (...targets) {
+	var copy = Object.assign({}, this);
+	targets.reverse();
+	Object.assign(this, ...targets, copy);
+}
+Array.prototype.copy = function () {
+	return this.map(ele => ele);
+};
+
+require('./eventManager');

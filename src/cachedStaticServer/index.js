@@ -28,6 +28,7 @@ var CacheManager = require('./cacheManager');
 
 module.exports = serveStatic;
 module.exports.mime = send.mime;
+module.exports.CacheManager = CacheManager;
 
 /**
  * @param {string} root

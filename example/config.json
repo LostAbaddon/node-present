@@ -15,5 +15,12 @@
 			"image": "img/",
 			"text": "fuck/"
 		}
+	},
+	"cache": {
+		"mem": {
+			"totalLimit": "10M",
+			"singleLimit": "1M",
+			"accept": [ "*" ]
+		}
 	}
 }
