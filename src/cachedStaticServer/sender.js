@@ -30,6 +30,7 @@ var path = require('path');
 var statuses = require('statuses');
 var Stream = require('stream');
 var util = require('util');
+var CachePack = require('./cacheManager').ResourceCachePack;
 
 /**
  * Path function references.
@@ -709,7 +710,7 @@ SendStream.prototype.sendFile = async function sendFile (path, cacheManager) {
 	var self = this;
 
 	var value = await cacheManager.load(path);
-	if (!value) value = {};
+	if (!value) value = new CachePack();
 	else value.cached = true;
 
 	if (value.cached) {
@@ -727,6 +728,7 @@ SendStream.prototype.sendFile = async function sendFile (path, cacheManager) {
 		// if (stat.isDirectory()) return self.redirect(path); // Don't show the folder
 		if (stat.isDirectory()) return next();
 		self.emit('file', path, stat);
+		value.path = path;
 		value.realpath = path;
 		self.send(path, stat, path, value, cacheManager);
 	});
@@ -745,6 +747,7 @@ SendStream.prototype.sendFile = async function sendFile (path, cacheManager) {
 			if (err) return next(err);
 			if (stat.isDirectory()) return next();
 			self.emit('file', p, stat);
+			value.path = path;
 			value.realpath = p;
 			self.send(p, stat, path, value, cacheManager);
 		});
@@ -783,6 +786,7 @@ SendStream.prototype.sendIndex = async function sendIndex (path, cacheManager) {
 			if (err) return next(err);
 			if (stat.isDirectory()) return next();
 			self.emit('file', p, stat);
+			value.path = path;
 			value.realpath = p;
 			self.send(p, stat, path, value, cacheManager);
 		});
