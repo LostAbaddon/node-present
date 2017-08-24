@@ -26,10 +26,10 @@ v0.1.0（开发中）
 
 ```json
 {
-	prefix: "",
+	prefix: "Resource::",
 	mem: {
-		totalLimit: "-1",
-		singleLimit: "-1",
+		totalLimit: "10M",
+		singleLimit: "100K",
 		accept: ['text', 'javascript', 'json']
 	}
 }

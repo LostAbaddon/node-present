@@ -94,8 +94,8 @@ class ResourceManager extends global.Utils.EventManager {
 			result.canSave = has;
 			if (!has) return false;
 			var size = content.size;
-			if (size >= self.config.mem.singleLimit) return false;
-			if (size + self.storageTotalUsage >= self.config.mem.totalLimit) return false;
+			if (self.config.mem.singleLimit >= 0 && size >= self.config.mem.singleLimit) return false;
+			if (self.config.mem.totalLimit >= 0 && size + self.storageTotalUsage >= self.config.mem.totalLimit) return false;
 			return true;
 		});
 	}
@@ -128,8 +128,6 @@ class ResourceManager extends global.Utils.EventManager {
 				value = self.storage[self.config.prefix + key];
 				self.onAfterLoad(key, result);
 			}
-			// console.log('>>>>>>>>>', key);
-			// console.log(value);
 			!!callback && callback(value);
 			res(value);
 		});
@@ -141,8 +139,13 @@ class ResourceManager extends global.Utils.EventManager {
 			var result = { canDelete: true };
 			self.onBeforeDelete(key, result);
 			if (result.canDelete) {
-				self.storage[self.config.prefix + key] = null;
-				delete self.storage[self.config.prefix + key];
+				let fullkey = self.config.prefix + key;
+				self.storage[fullkey] = null;
+				delete self.storage[fullkey];
+				let size = self.storageUsage[fullkey];
+				self.storageUsage[fullkey] = 0;
+				delete self.storageUsage[fullkey];
+				self.storageTotalUsage -= size;
 				self.onAfterDelete(key, result);
 			}
 			!!callback && callback();
@@ -160,6 +163,8 @@ class ResourceManager extends global.Utils.EventManager {
 					self.storage[key] = null;
 					delete self.storage[key];
 				}
+				self.storageUsage = {};
+				self.storageTotalUsage = 0;
 				self.onAfterClear(result);
 			}
 			!!callback && callback();
