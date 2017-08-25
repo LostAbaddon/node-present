@@ -2,8 +2,8 @@
  * Name:	Simple Server
  * Desc:    简易服务器，通过配置文件实现静态资源获取、下载、上传、跳转以及WebAPI接口
  * Author:	LostAbaddon
- * Version:	0.0.1
- * Date:	2017.08.19
+ * Version:	0.0.2
+ * Date:	2017.08.25
  */
 
 require('./core');
@@ -133,9 +133,19 @@ const server = config => {
 		config.upload.url = config.upload.url || pathUrlize(config.upload.destination);
 		require('./uploader')(app, config.upload, config.callbacks.upload);
 	}
-	
+
 	// CacheManager
 	var cacheManager = new CacheManager(config.cache);
+	cacheManager.lookBeforeSave((path, content, result, event) => {
+		var config = event.target.config;
+		var mime = content.mime;
+		var has = config.mem.accept.some(m => m === mime || m === '*');
+		result.canSave = has;
+		if (!has) return true;
+		var size = content.size;
+		if (config.mem.singleLimit >= 0 && size >= config.mem.singleLimit) return true;
+		if (config.mem.totalLimit >= 0 && size + event.target.storageTotalUsage >= config.mem.totalLimit) return true;
+	});
 	// Static Folder
 	config.root.map(path => app.use(CacheedStaticServer(path, {
 		cache: cacheManager

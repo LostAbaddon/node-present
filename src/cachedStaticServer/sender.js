@@ -3,6 +3,11 @@
  * Copyright(c) 2012 TJ Holowaychuk
  * Copyright(c) 2014-2016 Douglas Christopher Wilson
  * MIT Licensed
+ *
+ * Modifier   : LostAbaddon
+ * Date       : 2017.08.25
+ * Version    : 0.0.1
+ * Description: Resource Cache
  */
 
 'use strict';

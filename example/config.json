@@ -20,7 +20,7 @@
 		"mem": {
 			"totalLimit": "10M",
 			"singleLimit": "1M",
-			"accept": [ "*" ]
+			"accept": [ "js", "json", "html", "text" ]
 		}
 	}
 }

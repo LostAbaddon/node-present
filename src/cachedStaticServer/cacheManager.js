@@ -3,7 +3,7 @@
  * Desc:    缓存资源管理器
  * Author:	LostAbaddon
  * Version:	0.0.1
- * Date:	2017.08.24
+ * Date:	2017.08.25
  */
 
 const Mime = require('mime');
@@ -88,16 +88,6 @@ class ResourceManager extends global.Utils.EventManager {
 		this.storageUsage = {};
 		this.storageTotalUsage = 0;
 		Object.defineProperty(this, 'storage', { enumerable: false });
-		this.lookBeforeSave((path, content, result, event) => {
-			var mime = content.mime;
-			var has = self.config.mem.accept.some(m => m === mime || m === '*');
-			result.canSave = has;
-			if (!has) return false;
-			var size = content.size;
-			if (self.config.mem.singleLimit >= 0 && size >= self.config.mem.singleLimit) return false;
-			if (self.config.mem.totalLimit >= 0 && size + self.storageTotalUsage >= self.config.mem.totalLimit) return false;
-			return true;
-		});
 	}
 	async save (key, value, callback) {
 		var self = this;
