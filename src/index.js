@@ -9,6 +9,7 @@
 require('./core');
 
 const Path = require('path');
+const FS = require('fs');
 const Express = require('express');
 const CacheedStaticServer = require('./cachedStaticServer')
 const CacheManager = CacheedStaticServer.CacheManager;
@@ -146,10 +147,24 @@ const server = config => {
 		if (config.mem.singleLimit >= 0 && size >= config.mem.singleLimit) return true;
 		if (config.mem.totalLimit >= 0 && size + event.target.storageTotalUsage >= config.mem.totalLimit) return true;
 	});
+	cacheManager.watchers = {};
 	// Static Folder
-	config.root.map(path => app.use(CacheedStaticServer(path, {
-		cache: cacheManager
-	})));
+	config.root.map(path => {
+		app.use(CacheedStaticServer(path, {
+			cache: cacheManager
+		}));
+		var watcher = FS.watch(path, {
+			persistent: true,
+			recursive: true,
+			encoding: 'utf8'
+		}, (event, file) => {
+			var fullpath = path + '/' + file;
+			cacheManager.delete(fullpath, () => {
+				info('Dump Cache: ' + fullpath);
+			});
+		});
+		cacheManager.watchers[path] = watcher;
+	});
 
 	// 404
 	app.use(config.error["404"]);

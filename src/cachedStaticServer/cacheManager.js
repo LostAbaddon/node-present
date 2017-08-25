@@ -130,12 +130,14 @@ class ResourceManager extends global.Utils.EventManager {
 			self.onBeforeDelete(key, result);
 			if (result.canDelete) {
 				let fullkey = self.config.prefix + key;
-				self.storage[fullkey] = null;
-				delete self.storage[fullkey];
-				let size = self.storageUsage[fullkey];
-				self.storageUsage[fullkey] = 0;
-				delete self.storageUsage[fullkey];
-				self.storageTotalUsage -= size;
+				if (!!self.storage[fullkey]) {
+					self.storage[fullkey] = null;
+					delete self.storage[fullkey];
+					let size = self.storageUsage[fullkey];
+					self.storageUsage[fullkey] = 0;
+					delete self.storageUsage[fullkey];
+					self.storageTotalUsage -= size;
+				}
 				self.onAfterDelete(key, result);
 			}
 			!!callback && callback();

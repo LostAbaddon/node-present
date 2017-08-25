@@ -64,7 +64,8 @@ const getTimeString = (h, m, s, ms, link) => {
 };
 const timeNormalize = (time, format, datelink, timelink, combinelink) => {
 	time = time || new Date();
-	format = format || 'YYYYMMDDhhmmssx';
+	// format = format || 'YYYYMMDDhhmmssx';
+	format = format || 'YYYYMMDDhhmmss';
 	datelink = datelink || '/';
 	timelink = timelink || ':';
 	combinelink = combinelink || ' ';
