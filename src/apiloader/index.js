@@ -7,13 +7,8 @@
  */
 
 const FS = require('fs');
-const Express = require('express');
-const BodyParser = require('body-parser');
 
-const multer = require('multer')().array();
-const jsonParser = BodyParser.json();
-const textParser = BodyParser.text({ 'defaultCharset': 'utf-8' });
-const urlEncodingParser = BodyParser.urlencoded({ extended: false });
+const Handlers = {};
 
 const dealFilePath = (path, root, url) => {
 	path = url + path.replace(root, '');
@@ -22,6 +17,15 @@ const dealFilePath = (path, root, url) => {
 	}
 	path = path.replace(/\/{(.*)}(\/|$)/gi, (match, tag) => '/:' + tag + '/');
 	return path;
+};
+const createReloadableHandler = (path, handler) => {
+	Handlers[path] = handler;
+	return (method, params, session, callback) => {
+		var hanlder = Handlers[path];
+		if (!handler) return null;
+		console.log('xxxxxxxx', path);
+		return handler(method, params, session, callback);
+	};
 };
 const mountHandler = (path, root, url, handlers) => {
 	var hanlder;
@@ -32,7 +36,7 @@ const mountHandler = (path, root, url, handlers) => {
 		return;
 	}
 	var url = dealFilePath(path, root, url);
-	handlers[url] = handler;
+	handlers[url] = createReloadableHandler(path, handler);
 };
 const searchFolder = (folder, root, url, handlers) => {
 	var contents;
@@ -77,33 +81,27 @@ const loadHandler = (app, pathlist) => {
 	});
 	Object.keys(handlers).map(path => {
 		var handler = handlers[path];
-		app.use(path,
-			multer,
-			urlEncodingParser,
-			jsonParser,
-			textParser,
-			(req, res, next) => {
-				var params = {};
-				if (req.body instanceof String || typeof req.body === 'string') {
-					let content;
-					try {
-						content = JSON.parse(req.body);
-					}
-					catch (err) {
-						content = req.body;
-					}
-					req.body = { data: content };
+		app.use(path, (req, res, next) => {
+			var params = {};
+			if (req.body instanceof String || typeof req.body === 'string') {
+				let content;
+				try {
+					content = JSON.parse(req.body);
 				}
-				else if (req.body instanceof Array || (!!req.body.map && !!req.body.some)) {
-					req.body = { data: req.body };
+				catch (err) {
+					content = req.body;
 				}
-				Object.assign(params, req.body, req.params, req.query);
-				handler(req.method, params, {}, result => {
-					if (result === null || result === undefined) next();
-					else res.json(result);
-				});
+				req.body = { data: content };
 			}
-		);
+			else if (req.body instanceof Array || (!!req.body.map && !!req.body.some)) {
+				req.body = { data: req.body };
+			}
+			Object.assign(params, req.body, req.params, req.query, req.cookies);
+			handler(req.method, params, {}, result => {
+				if (result === null || result === undefined) next();
+				else res.json(result);
+			});
+		});
 	});
 };
 

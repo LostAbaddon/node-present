@@ -64,14 +64,26 @@ class ResourceCachePack {
 		this.lastModified = null;
 		this.etag = '';
 		this.chunks = [];
+		this.visit = 0;
+		this._mime = '';
+		this._size = 0;
+		Object.defineProperty(this, '_mime', { enumerable: false });
+		Object.defineProperty(this, '_size', { enumerable: false });
 	}
 	get mime () {
-		return Mime.lookup(this.realpath);
+		if (this._mime === '') this._mime = Mime.lookup(this.realpath);
+		return this._mime;
 	}
 	get size () {
-			var size = 0;
+		if (this._size === 0) {
+			let size = 0;
 			this.chunks.map(chk => size += chk.length);
-			return size;
+			this._size = size;
+		}
+		return this._size;
+	}
+	get rate () {
+		return this.size / (1 + Math.log(1 + this.visit));
 	}
 }
 class ResourceManager extends global.Utils.EventManager {
@@ -96,13 +108,17 @@ class ResourceManager extends global.Utils.EventManager {
 			var size = value.size;
 			var result = { canSave: true };
 			self.onBeforeSave(key, value, result);
+			let fullkey = self.config.prefix + key;
 			if (result.canSave) {
-				let fullkey = self.config.prefix + key;
-				self.storage[fullkey] = value;
 				self.storageUsage[fullkey] = size;
 				self.storageTotalUsage += size;
-				self.onAfterSave(key, value, result);
 			}
+			else {
+				value.cached = false;
+				self.storageUsage[fullkey] = 0;
+			}
+			self.storage[fullkey] = value;
+			self.onAfterSave(key, value, result);
 			!!callback && callback();
 			res();
 		});

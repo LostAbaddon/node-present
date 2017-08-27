@@ -1,6 +1,6 @@
 var result = {
-	"name": "Hello Moto!",
-	"nick": "Aloha Kosmos~"
+	"name": "Hello Moto!xxxx",
+	"nick": "Aloha Kosmos~xxxx"
 };
 
 var handler = (method, params, session, callback) => {

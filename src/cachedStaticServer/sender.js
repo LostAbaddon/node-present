@@ -716,7 +716,6 @@ SendStream.prototype.sendFile = async function sendFile (path, cacheManager) {
 
 	var value = await cacheManager.load(path);
 	if (!value) value = new CachePack();
-	else value.cached = true;
 
 	if (value.cached) {
 		self.send(path, null, path, value, cacheManager);
@@ -771,7 +770,6 @@ SendStream.prototype.sendIndex = async function sendIndex (path, cacheManager) {
 
 	var value = await cacheManager.load(path);
 	if (!value) value = {};
-	else value.cached = true;
 
 	if (value.cached) {
 		self.send(path, null, path, value, cacheManager);
@@ -812,6 +810,7 @@ SendStream.prototype.stream = async function stream (path, options, key, cache, 
 	var self = this;
 	var res = this.res;
 
+	cache.visit ++;
 	if (cache.cached) {
 		for (let chunk of cache.chunks) {
 			await res.write(chunk);

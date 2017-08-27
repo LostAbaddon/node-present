@@ -3,14 +3,22 @@
  * Desc:    简易服务器，通过配置文件实现静态资源获取、下载、上传、跳转以及WebAPI接口
  * Author:	LostAbaddon
  * Version:	0.0.2
- * Date:	2017.08.25
+ * Date:	2017.08.26
  */
 
 require('./core');
 
 const Path = require('path');
 const FS = require('fs');
+
 const Express = require('express');
+const BodyParser = require('body-parser');
+const multer = require('multer')().array();
+const jsonParser = BodyParser.json();
+const textParser = BodyParser.text({ 'defaultCharset': 'utf-8' });
+const urlEncodingParser = BodyParser.urlencoded({ extended: false });
+const cookieParser = require('cookie-parser')();
+
 const CacheedStaticServer = require('./cachedStaticServer')
 const CacheManager = CacheedStaticServer.CacheManager;
 
@@ -93,6 +101,12 @@ const server = config => {
 	});
 
 	// WebAPI
+	app.use('/', multer,
+		urlEncodingParser,
+		jsonParser,
+		textParser,
+		cookieParser
+	);
 	require('./apiloader')(app, config.api);
 
 	// Forbidden Path
@@ -139,13 +153,28 @@ const server = config => {
 	var cacheManager = new CacheManager(config.cache);
 	cacheManager.lookBeforeSave((path, content, result, event) => {
 		var config = event.target.config;
+		var storage = event.target.storage;
 		var mime = content.mime;
 		var has = config.mem.accept.some(m => m === mime || m === '*');
-		result.canSave = has;
-		if (!has) return true;
+		if (!has) {
+			result.canSave = false;
+			return true;
+		}
 		var size = content.size;
-		if (config.mem.singleLimit >= 0 && size >= config.mem.singleLimit) return true;
-		if (config.mem.totalLimit >= 0 && size + event.target.storageTotalUsage >= config.mem.totalLimit) return true;
+		if (config.mem.singleLimit >= 0 && size >= config.mem.singleLimit) {
+			result.canSave = false;
+			return true;
+		}
+		if (config.mem.totalLimit >= 0 && size + event.target.storageTotalUsage >= config.mem.totalLimit) {
+			for (let key of Object.keys(storage)) {
+				console.log('.......');
+				console.log(key);
+				let cache = storage[key];
+				console.log(path, key, cache.visit, cache.size);
+			}
+			result.canSave = false;
+			return true;
+		}
 	});
 	cacheManager.watchers = {};
 	// Static Folder

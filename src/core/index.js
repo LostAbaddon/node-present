@@ -15,17 +15,10 @@
 
 const FS = require('fs');
 const Path = require('path');
+require('./moduleManager');
+require('./eventManager');
 
 global.Utils = global.Utils || {};
-
-global.reload = path => {
-	path = require.resolve(path);
-	var module = require.cache[path];
-	if (module.parent) {
-		module.parent.children.splice(module.parent.children.indexOf(module), 1);
-	}
-	delete require.cache[path];
-};
 
 String.prototype.prepadding = function (len, padding) {
 	var str = this.toString();
@@ -189,5 +182,3 @@ Object.prototype.extent = function (...targets) {
 Array.prototype.copy = function () {
 	return this.map(ele => ele);
 };
-
-require('./eventManager');

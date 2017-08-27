@@ -18,9 +18,9 @@
 	},
 	"cache": {
 		"mem": {
-			"totalLimit": "10M",
+			"totalLimit": "1M",
 			"singleLimit": "1M",
-			"accept": [ "js", "json", "html", "text" ]
+			"accept": [ "*" ]
 		}
 	}
 }
