@@ -112,6 +112,7 @@ class ResourceManager extends global.Utils.EventManager {
 			if (result.canSave) {
 				self.storageUsage[fullkey] = size;
 				self.storageTotalUsage += size;
+				value.cached = true;
 			}
 			else {
 				value.cached = false;
@@ -177,6 +178,13 @@ class ResourceManager extends global.Utils.EventManager {
 			}
 			!!callback && callback();
 			res();
+		});
+	}
+	arrange () {
+		console.log('....');
+		Object.keys(this.storage).map(c => {
+			c = this.storage[c];
+			if (c.cached) console.log(c.path, c.size, c.visit);
 		});
 	}
 }

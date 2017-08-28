@@ -17,8 +17,9 @@
 		}
 	},
 	"cache": {
+		"timer": 1000,
 		"mem": {
-			"totalLimit": "1M",
+			"totalLimit": "854400",
 			"singleLimit": "1M",
 			"accept": [ "*" ]
 		}

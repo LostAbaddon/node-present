@@ -151,6 +151,10 @@ const server = config => {
 
 	// CacheManager
 	var cacheManager = new CacheManager(config.cache);
+	var cacheArranger = () => {
+		cacheManager.arrange();
+		setTimeout(cacheArranger, config.cache.timer);
+	};
 	cacheManager.lookBeforeSave((path, content, result, event) => {
 		var config = event.target.config;
 		var storage = event.target.storage;
@@ -161,17 +165,11 @@ const server = config => {
 			return true;
 		}
 		var size = content.size;
-		if (config.mem.singleLimit >= 0 && size >= config.mem.singleLimit) {
+		if ((config.mem.singleLimit >= 0) && (size >= config.mem.singleLimit)) {
 			result.canSave = false;
 			return true;
 		}
-		if (config.mem.totalLimit >= 0 && size + event.target.storageTotalUsage >= config.mem.totalLimit) {
-			for (let key of Object.keys(storage)) {
-				console.log('.......');
-				console.log(key);
-				let cache = storage[key];
-				console.log(path, key, cache.visit, cache.size);
-			}
+		if ((config.mem.totalLimit >= 0) && (size + event.target.storageTotalUsage >= config.mem.totalLimit)) {
 			result.canSave = false;
 			return true;
 		}
@@ -199,6 +197,7 @@ const server = config => {
 	app.use(config.error["404"]);
 
 	app.config = config;
+	cacheArranger();
 	app.listen(config.port);
 
 	log('Server Started...');

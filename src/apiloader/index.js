@@ -23,7 +23,7 @@ const createReloadableHandler = (path, handler) => {
 	return (method, params, session, callback) => {
 		var hanlder = Handlers[path];
 		if (!handler) return null;
-		console.log('xxxxxxxx', path);
+		// console.log('xxxxxxxx', path);
 		return handler(method, params, session, callback);
 	};
 };
