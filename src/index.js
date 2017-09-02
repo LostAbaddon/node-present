@@ -151,10 +151,6 @@ const server = config => {
 
 	// CacheManager
 	var cacheManager = new CacheManager(config.cache);
-	var cacheArranger = () => {
-		cacheManager.arrange();
-		setTimeout(cacheArranger, config.cache.timer);
-	};
 	cacheManager.lookBeforeSave((path, content, result, event) => {
 		var config = event.target.config;
 		var storage = event.target.storage;
@@ -197,7 +193,6 @@ const server = config => {
 	app.use(config.error["404"]);
 
 	app.config = config;
-	cacheArranger();
 	app.listen(config.port);
 
 	log('Server Started...');

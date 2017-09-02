@@ -67,6 +67,8 @@ class ResourceCachePack {
 		this.visit = 0;
 		this._mime = '';
 		this._size = 0;
+		this.created = 0;
+		this.updated = 0;
 		Object.defineProperty(this, '_mime', { enumerable: false });
 		Object.defineProperty(this, '_size', { enumerable: false });
 	}
@@ -84,6 +86,13 @@ class ResourceCachePack {
 	}
 	get rate () {
 		return this.size / (1 + Math.log(1 + this.visit));
+	}
+	delete () {
+		this.stat = null;
+		this.chunks = [];
+		this._size = 0;
+		this.created = 0;
+		this.updated = 0;
 	}
 }
 class ResourceManager extends global.Utils.EventManager {
@@ -118,6 +127,7 @@ class ResourceManager extends global.Utils.EventManager {
 				value.cached = false;
 				self.storageUsage[fullkey] = 0;
 			}
+			if (value.created === 0) value.created = new Date().getTime();
 			self.storage[fullkey] = value;
 			self.onAfterSave(key, value, result);
 			!!callback && callback();
@@ -134,6 +144,7 @@ class ResourceManager extends global.Utils.EventManager {
 			if (result.canLoad) {
 				value = self.storage[self.config.prefix + key];
 				self.onAfterLoad(key, result);
+				!!value && (value.updated = new Date().getTime());
 			}
 			!!callback && callback(value);
 			res(value);
@@ -148,11 +159,9 @@ class ResourceManager extends global.Utils.EventManager {
 			if (result.canDelete) {
 				let fullkey = self.config.prefix + key;
 				if (!!self.storage[fullkey]) {
-					self.storage[fullkey] = null;
-					delete self.storage[fullkey];
+					self.storage[fullkey].delete();
 					let size = self.storageUsage[fullkey];
 					self.storageUsage[fullkey] = 0;
-					delete self.storageUsage[fullkey];
 					self.storageTotalUsage -= size;
 				}
 				self.onAfterDelete(key, result);
