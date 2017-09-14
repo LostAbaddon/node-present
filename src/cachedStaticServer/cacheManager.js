@@ -132,6 +132,8 @@ class ResourceManager extends global.Utils.EventManager {
 			self.onAfterSave(key, value, result);
 			!!callback && callback();
 			res();
+			console.log('Save-Arrange');
+			self.arrange();
 		});
 	}
 	async load (key, callback) {
@@ -143,11 +145,14 @@ class ResourceManager extends global.Utils.EventManager {
 			var value = null;
 			if (result.canLoad) {
 				value = self.storage[self.config.prefix + key];
+				if (!value) value = new ResourceManager.ResourceCachePack();
+				value.updated = new Date().getTime();
 				self.onAfterLoad(key, result);
-				!!value && (value.updated = new Date().getTime());
 			}
 			!!callback && callback(value);
 			res(value);
+			console.log('Load-Arrange');
+			self.arrange();
 		});
 	}
 	async delete (key, callback) {
