@@ -110,6 +110,9 @@ const server = config => {
 	require('./apiloader')(app, config.api);
 
 	// Forbidden Path
+	if (!!config.upload) {
+		if (config.forbid.length === 0) config.forbid.push(config.upload.destination);
+	}
 	config.forbid.map(path => {
 		var urlpath = pathUrlize(path);
 		app.use(urlpath, config.error["404"]);
@@ -142,7 +145,6 @@ const server = config => {
 
 	// Upload Folder
 	if (!!config.upload) {
-		if (config.forbid.length === 0) config.forbid.push(config.upload.destination);
 		config.upload = Object.assign(DefaultUploadConfig, config.upload);
 		config.upload.classify = Object.assign(DefaultUploadConfig.classify, config.upload.classify);
 		config.upload.url = config.upload.url || pathUrlize(config.upload.destination);
