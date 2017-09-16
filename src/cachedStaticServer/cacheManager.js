@@ -183,8 +183,7 @@ class ResourceManager extends global.Utils.EventManager {
 			self.onBeforeClear(result);
 			if (result.canClear) {
 				for (let key in self.storage) {
-					self.storage[key] = null;
-					delete self.storage[key];
+					self.storage[key] = undefined;
 				}
 				self.storageUsage = {};
 				self.storageTotalUsage = 0;
