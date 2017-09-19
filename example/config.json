@@ -1,7 +1,7 @@
 {
 	"loglev": 0,
 	"port": 8080,
-	"root": [ "./web", "./" ],
+	"root": [ "./web", "./h5", "./" ],
 	"download": [ "./download", "./dl" ],
 	"forbid": [ "web" ],
 	"redirect": {

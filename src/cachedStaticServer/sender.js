@@ -631,6 +631,7 @@ SendStream.prototype.send = function send (path, stat, key, cache, cacheManager)
 		}
 
 		if (this.isCachable() && this.isFresh()) {
+			cache.visit ++; // 浏览器缓存页增加访问请求次数
 			this.notModified();
 			return;
 		}

@@ -1,21 +1,10 @@
-var n = 10000; // 数量
-var v = 300; // 总容量
-var vs = []; // 容量组
-var ns = []; // 耗时组
-var poollimit = 1;
-
-const init = () => {
-	for (let i = 0; i < n; i ++) {
-		// vs[i] = Math.random() * 10;
-		vs[i] = Math.pow(Math.random(), 2) * 10;
-		// ns[i] = (Math.random() + Math.random()) / 2 * 10;
-		// ns[i] = Math.pow(Math.random(), 0.2) * 10;
-		// ns[i] = Math.random() * 10;
-		// ns[i] = 10 * Math.pow(1 - vs[i] / 10, 2) * Math.random() * Math.random();
-		ns[i] = 10 - Math.pow((Math.random() + Math.random()) / 2, 5) * 10;
-		// ns[i] = Math.sqrt(10 * vs[i]);
-	}
-};
+/**
+ * Name:	Algorithm
+ * Desc:    算法
+ * Author:	LostAbaddon
+ * Version:	0.0.1
+ * Date:	2017.09.20
+ */
 
 const find2ndSameP = (inside, outside, pow) => {
 	var totalV = 0, totalT = 0;
@@ -25,7 +14,7 @@ const find2ndSameP = (inside, outside, pow) => {
 	});
 	// 重整列外排序
 	var index = outside.map(i => {
-		var weight = ns[i] * Math.pow(vs[i], pow);
+		var weight = ns[i] * Math.pow(vs[i], -2 - pow);
 		return [weight, i];
 	});
 	index.sort((a, b) => b[0] - a[0]);
@@ -98,57 +87,30 @@ const find2nd = (inside, outside, pow) => {
 	return [result, maxV, maxT];
 };
 
-const cal = (p, verse, smooth) => {
+const ArrangePow = 0.9;
+const arrangeRoom = (goods, sizeLimit) => {
 	var start = new Date().getTime();
-	var pow = i => ns[i] * Math.pow(vs[i], p);
-	var ps = [];
-	for (let i = 0; i < n; i ++) {
-		ps[i] = [i, pow(i)];
-	}
-	if (!!verse) {
-		ps.sort((a, b) => a[1] - b[1]);
-	}
-	else {
-		ps.sort((a, b) => b[1] - a[1]);
-	}
-
-	var c = [];
-	var pv = 0;
-	var pt = 0;
-
-	ps.map(p => {
-		var i = p[0];
-		var pc = vs[i];
-		var tpv = pv + pc;
-		if (tpv <= v) {
-			pv = tpv;
-			pt += ns[i];
-			c.push(i);
+	var totalValue = 0, totalSize = 0, inside = [], outside = [];
+	var room = goods.map(g => [g.value / Math.pow(g.size, ArrangePow), g.size, g]);
+	room.sort((ga, gb) => gb[0] - ga[0]);
+	room.map(g => {
+		var v = g[0], s = g[1];
+		var nextSize = totalSize + s;
+		if (nextSize < sizeLimit) {
+			totalSize = nextSize;
+			totalValue += v;
+			inside.push(g);
 		}
 	});
+	room.map(g => !!(inside.indexOf(g) < 0) && outside.push(g));
+	outside = outside.map(g => g[0] = g[2].value / Math.pow(g[1], 2 - ArrangePow));
+	outside.sort((ga, gb) => gb[0] - ga[0]);
 
-	var cc = [];
-	ps.map(p => !!(c.indexOf(p[0]) < 0) && cc.push(p[0]));
-
-	if (!!smooth) {
-		c = smooth(c, cc, p);
-		pv = c[1];
-		pt = c[2];
-		c = c[0];
-	}
-
-	var end = new Date().getTime();
-	console.log('POW: ' + p + ' | USE: ' + pv + ' : TOTAL: ' + pt + ' : LEN: ' + c.length + ' || TimeSpent: ' + (end - start));
-	// console.log(c);
+	return inside.map(g => g[2]);
 };
 
-// init();
-// for (let i = -1.5; i <= -0.5; i += 0.01) {
-// 	console.log('>>>>>>>>>>>>>>>>>>>>>>>>');
-// 	cal(i);
-// 	cal(i, false, find2ndSameP);
-// 	poollimit = 1;
-// 	cal(i, false, find2nd);
-// 	poollimit = 100;
-// 	cal(i, false, find2nd);
-// }
+module.exports.arrangeRoom = arrangeRoom;
+global.Utils = global.Utils || {};
+global.Utils.Algorithm = {
+	arrangeRoom: arrangeRoom
+};

@@ -14,6 +14,10 @@ const DefaultConfig = {
 		totalLimit: "-1",
 		singleLimit: "-1",
 		accept: ['text', 'javascript', 'json']
+	},
+	interval: {
+		"arrange": "1s",
+		"checkout": "1m"
 	}
 };
 
@@ -54,6 +58,48 @@ const realSize = size => {
 	}
 	return result;
 };
+const realTime = time => {
+	var result = time * 1;
+	if (!isNaN(result)) return result;
+	var last = time.substring(time.length - 1, time.length);
+	result = time.substring(0, time.length - 1) * 1;
+	if (isNaN(result)) return 0;
+	last = last.toLowerCase();
+	if (last === 's') {
+		result *= 1000;
+	}
+	else if (last === 'm') {
+		result *= 1000;
+		result *= 60;
+	}
+	else if (last === 'h') {
+		result *= 1000;
+		result *= 60;
+		result *= 60;
+	}
+	else if (last === 'd') {
+		result *= 1000;
+		result *= 60;
+		result *= 60;
+		result *= 24;
+	}
+	else if (last === 'y') {
+		result *= 1000;
+		result *= 60;
+		result *= 60;
+		result *= 24;
+		result *= 365;
+	}
+	else if (last === 'c') {
+		result *= 1000;
+		result *= 60;
+		result *= 60;
+		result *= 24;
+		result *= 365;
+		result *= 100;
+	}
+	return result;
+};
 
 class ResourceCachePack {
 	constructor () {
@@ -85,14 +131,21 @@ class ResourceCachePack {
 		return this._size;
 	}
 	get rate () {
-		return this.size / (1 + Math.log(1 + this.visit));
+		var now = new Date().getTime();
+		var cnow = Math.ceil((now - this.created) / 1000 / 60); // 创建寿命，分钟为单位
+		var unow = Math.ceil((now - this.updated) / 1000 / 60); // 访问寿命，分钟为单位
+		if (cnow < 1) cnow = 1;
+		if (unow < 1) unow = 1;
+		var cpow = this.visit / cnow; // 单位时间访问量
+		var upow = Math.log(1 + this.visit) / (unow < 1 ? 1 : unow); // 最近访问量指数
+		var spow = this.size / 1024; // 体积指数，KB为单位
+		var rate = (2 * upow + cpow) * spow;
+		return rate;
 	}
 	delete () {
 		this.stat = null;
 		this.chunks = [];
 		this._size = 0;
-		this.created = 0;
-		this.updated = 0;
 		this.cached = false;
 	}
 }
@@ -106,10 +159,18 @@ class ResourceManager extends global.Utils.EventManager {
 		this.config.mem.accept = this.config.mem.accept.map(type => type2mime(type));
 		this.config.mem.totalLimit = realSize(this.config.mem.totalLimit);
 		this.config.mem.singleLimit = realSize(this.config.mem.singleLimit);
+		this.config.interval.extent(DefaultConfig.interval);
+		this.config.interval.arrange = realTime(this.config.interval.arrange);
+		this.config.interval.checkout = realTime(this.config.interval.checkout);
 		this.storage = {};
 		this.storageUsage = {};
 		this.storageTotalUsage = 0;
 		Object.defineProperty(this, 'storage', { enumerable: false });
+
+		// Temp
+		setTimeout(() => {
+			this.arrange();
+		}, this.config.interval.arrange);
 	}
 	async save (key, value, callback) {
 		var self = this;
@@ -129,12 +190,11 @@ class ResourceManager extends global.Utils.EventManager {
 				self.storageUsage[fullkey] = 0;
 			}
 			if (value.created === 0) value.created = new Date().getTime();
+			if (value.created > (value.updated || 0)) value.created = value.updated
 			self.storage[fullkey] = value;
 			self.onAfterSave(key, value, result);
 			!!callback && callback();
 			res();
-			console.log('Save-Arrange');
-			self.arrange();
 		});
 	}
 	async load (key, callback) {
@@ -152,8 +212,6 @@ class ResourceManager extends global.Utils.EventManager {
 			}
 			!!callback && callback(value);
 			res(value);
-			console.log('Load-Arrange');
-			self.arrange();
 		});
 	}
 	async delete (key, callback) {
@@ -195,11 +253,26 @@ class ResourceManager extends global.Utils.EventManager {
 		});
 	}
 	arrange () {
-		console.log('....');
+		console.log('>>>>....');
+		var map = [];
 		Object.keys(this.storage).map(c => {
-			c = this.storage[c];
-			if (c.cached) console.log(c.path, c.size, c.visit);
+			var d = this.storage[c];
+			map.push({
+				key: c,
+				value: d.rate,
+				size: d.size / 1024 // 体积以KB为单位
+			});
 		});
+		map = global.Utils.Algorithm.arrangeRoom(map, this.config.mem.totalLimit / 1024);
+		map.map(c => {
+			var r = c.value, s = c.size;
+			c = c.key;
+			c = this.storage[c];
+			console.log(c.realpath, r, s, c.visit);
+		});
+		setTimeout(() => {
+			this.arrange();
+		}, this.config.interval.arrange);
 	}
 }
 
