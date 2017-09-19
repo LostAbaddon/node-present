@@ -1,0 +1,595 @@
+/* http://website.ruubypay.com/folding/css/index.css */
+@font-face {
+    font-family: 'DINPro';
+    src: url(http://website.ruubypay.com/folding/font/DINPro-Bold.otf);
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+*::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Pingfang SC', Arial, '微软雅黑', '宋体', sans-serif;
+    color: #fff;
+}
+
+.container {
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    min-width: 300px;
+}
+
+.section {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 125%;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.section .bg-gradient {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: .8;
+}
+
+.section-title {
+    position: absolute;
+    top: 3%;
+    left: 8%;
+    height: 17%;
+}
+
+.section-content {
+    position: absolute;
+    top: 17%;
+    left: 8%;
+    right: 8%;
+    height: 80%;
+}
+
+.section-title h3 {
+    line-height: 1;
+}
+
+.title-en {
+    font-family: 'DINPro';
+    font-size: 8vw;
+    font-weight: bold;
+    text-transform: Uppercase;
+}
+
+.title-zh {
+    display: inline-block;
+    font-weight: 300;
+    padding-top: 1.5vh;
+    margin-top: 1.5vh;
+    border-top: 0.3vh solid #fff;
+    font-size: 5vw;
+    vertical-align: text-top;
+}
+
+.content-img,
+.content-video,
+.content-title,
+.content-title-sub,
+.content-p {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.content-img img {
+    height: 100%;
+}
+
+.content-video {
+    height: 34%;
+    background-color: #000;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.content-video video {
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.content-title h4 {
+    display: inline-block;
+    font-size: 7vw;
+    font-weight: 600;
+    text-align: left;
+    vertical-align: top;
+}
+
+.content-title-sub h5 {
+    display: inline-block;
+    font-size: 5vw;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: top;
+}
+
+.content-p p {
+    display: inline-block;
+    font-size: 3.5vw;
+    text-align: left;
+    vertical-align: top;
+}
+
+.bottom-logo {
+    top: 95%;
+    bottom: -2%;
+}
+
+.user-select-none {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.music{
+    position: absolute;
+    top:2%;
+    right: 3%;
+    width: 35px;
+    height: 35px;
+    background-image: url(../img/music-disabled.png);
+    background-size: contain;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.music.active{
+    background-image: url(../img/music.png);
+}
+
+.next-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: 8.1%;
+    margin-left: -10px;
+    width: 20px;
+    height: 20px;
+    border-left: 3px solid rgba(255, 255, 255, 0.45);
+    border-top: 3px solid rgba(255, 255, 255, 0.45);
+    opacity: 0;
+}
+
+.next-arrow.active {
+    -webkit-animation: arrowFadeUp 2s 0s ease-out infinite;
+    animation: arrowFadeUp 2s 0s ease-out infinite;
+}
+
+.next-arrow::after {
+    position: relative;
+    top: 2px;
+    left: 2px;
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+@-webkit-keyframes arrowFadeUp {
+    from {
+        -webkit-transform: translate3d(0, 50%, 0) rotateZ(45deg);
+        transform: translate3d(0, 50%, 0) rotateZ(45deg);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translate3d(0, -50%, 0) rotateZ(45deg);
+        transform: translate3d(0, -50%, 0) rotateZ(45deg);
+        opacity: 1;
+    }
+}
+
+@keyframes arrowFadeUp {
+    from {
+        -webkit-transform: translate3d(0, 50%, 0) rotateZ(45deg);
+        transform: translate3d(0, 50%, 0) rotateZ(45deg);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translate3d(0, -50%, 0) rotateZ(45deg);
+        transform: translate3d(0, -50%, 0) rotateZ(45deg);
+        opacity: 1;
+    }
+}
+
+#company-background {
+    background-image: url(http://website.ruubypay.com/folding/img/bg1.jpg?imageView2/2/w/300);
+}
+
+#company-background .bg-gradient {
+    background-image: linear-gradient(135deg, #9890E3 0%, #B1F4CF 100%);
+}
+
+#company-background .content-img {
+    top: 6.3%;
+    bottom: 68.23%;
+}
+
+#company-background .content-title {
+    top: 40.47%;
+}
+
+#company-background .content-title-sub {
+    top: 53.87%;
+}
+
+#company-background .content-p {
+    top: 70.62%;
+}
+
+#ruubypay-definition {
+    background-image: url(http://website.ruubypay.com/folding/img/bg2.jpg?imageView2/2/w/400);
+    background-size: cover;
+}
+
+#ruubypay-definition .bg-gradient {
+    background-image: linear-gradient(135deg, #F5576C 0%, #F093FB 100%);
+}
+
+#ruubypay-definition .content-title {
+    top: 8.3%;
+}
+
+#ruubypay-definition .content-img {
+    top: 33%;
+    bottom: 41.53%;
+}
+
+#ruubypay-definition .content-p {
+    top: 68%;
+}
+
+#preferential-means {
+    background-image: url(http://website.ruubypay.com/folding/img/bg3.jpg?imageView2/2/w/300);
+    background-size: cover;
+}
+
+#preferential-means .bg-gradient {
+    background-image: linear-gradient(135deg, #00DBDE, #FC00FF);
+}
+
+#preferential-means #coupon {
+    top: 8.6%;
+}
+
+#preferential-means #coupon img {
+    width: 32%;
+    height: auto;
+}
+
+#preferential-means .content-p {
+    top: 31.7%;
+}
+
+#preferential-means .content-p p {
+    font-size: 3vw;
+}
+
+#preferential-means #payment-method {
+    left: -10%;
+    right: -10%;
+    top: 71.4%;
+    background-color: #fff;
+    padding: 2% 10%;
+}
+
+#preferential-means #payment-method img {
+    width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+#preferential-means #info {
+    top: 82.5%;
+}
+
+#preferential-means #info p {
+    display: block;
+    margin-left: -9%;
+    white-space: nowrap;
+    -webkit-transform: scale(.9);
+    transform: scale(.9);
+}
+
+#milestone {
+    background-image: url(http://website.ruubypay.com/folding/img/bg4.jpg?imageView2/2/w/400);
+    background-size: cover;
+}
+
+#milestone .bg-gradient {
+    background-image: linear-gradient(135deg, #9593EE 0%, #F9C6D2 100%);
+}
+
+#milestone .time-line {
+    position: absolute;
+    top: 7.3%;
+    list-style: none;
+}
+
+#milestone .time-line-item {
+    overflow: hidden;
+}
+
+#milestone .time-line-item .time-line-date {
+    display: inline-block;
+    width: 40%;
+    vertical-align: middle;
+    height: 0;
+    padding-bottom: 27%;
+    background-position: center;
+    background-size: 85.4%;
+    background-repeat: no-repeat;
+}
+
+#milestone .time-line-date.date1 {
+    background-image: url(http://website.ruubypay.com/folding/img/milestone-arrow1.png?imageView2/2/w/400);
+}
+
+#milestone .time-line-date.date2 {
+    background-image: url(http://website.ruubypay.com/folding/img/milestone-arrow2.png?imageView2/2/w/400);
+}
+
+#milestone .time-line-date.date3 {
+    background-image: url(http://website.ruubypay.com/folding/img/milestone-arrow3.png?imageView2/2/w/400);
+}
+
+#milestone .time-line-item .time-line-desc,
+#milestone .time-line-item .time-line-note {
+    display: inline-block;
+    width: 57%;
+    vertical-align: middle;
+    font-size: 4.1vw;
+}
+
+#milestone .time-line-item .time-line-note {
+    font-size: 2vw;
+    color: #A1538A;
+    float: right;
+    padding-bottom: 2%;
+}
+
+#team {
+    background-image: url(http://website.ruubypay.com/folding/img/bg5.jpg?imageView2/2/w/300);
+}
+
+#team .bg-gradient {
+    background-image: linear-gradient(135deg, #F87098 0%, #FCDF40 100%);
+}
+
+#team .content-title {
+    top: 20%;
+}
+
+#team .content-p {
+    top: 55%;
+}
+
+#media-coverage {
+    background-image: url(http://website.ruubypay.com/folding/img/bg6.jpg?imageView2/2/w/400);
+    background-size: cover;
+    background-position: 30% center;
+}
+
+#media-coverage .bg-gradient {
+    background-image: linear-gradient(135deg, #404295 0%, #404295 31%, #00598B 54%, #002A67 100%);
+}
+
+#media-coverage #media {
+    left: -10%;
+    right: -10%;
+    top: 8%;
+    background-color: #fff;
+    padding: 6% 10%;
+}
+
+#media-coverage #media img {
+    width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+#media-coverage .statistics {
+    position: absolute;
+    top: 49%;
+    left: 0;
+    right: 0;
+}
+
+#media-coverage .statistics-circles {
+    /*overflow: hidden;*/
+}
+
+#media-coverage .circle {
+    position: relative;
+    display: inline-block;
+    width: 45%;
+    height: 0;
+    padding-bottom: 45%;
+    background: url(http://website.ruubypay.com/folding/img/circle.png) no-repeat center;
+    background-size: 175%;
+    float: left;
+}
+
+#media-coverage .circle:nth-of-type(2) {
+    float: right;
+}
+
+#media-coverage .circle-title,
+#media-coverage .circle-num {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+#media-coverage .circle-title {
+    color: #49D6FC;
+    font-size: 4vw;
+    top: 20%;
+}
+
+#media-coverage .circle-num {
+    color: #FFCC7B;
+    font-size: 7vw;
+    top: 35%;
+}
+
+#media-coverage .circle-num.larger {
+    font-size: 11vw;
+    top: 26%;
+}
+
+#media-coverage .circle-num::after {
+    content: '+';
+    display: inline-block;
+    color: #FFCC7B;
+    vertical-align: super;
+}
+
+#media-coverage .statistics-p {
+    position: absolute;
+    top: 75%;
+    font-size: 3vw;
+}
+
+#government {
+    background-image: url(http://website.ruubypay.com/folding/img/bg7-8.jpg?imageView2/2/w/400);
+    background-size: cover;
+}
+
+#government .bg-gradient {
+    background-image: linear-gradient(135deg, #F57062 0%, #FC5194 100%);
+}
+
+#government .content-p {
+    top: 10%;
+    /*overflow: hidden;*/
+}
+
+#government #bmct-logo {
+    width: 20%;
+    float: left;
+}
+
+#government #bmct-logo img {
+    width: 100%;
+    height: auto;
+}
+
+#government .content-p p {
+    width: 79%;
+    padding-left: 2%;
+}
+
+#government #government-interview {
+    top: 40%;
+}
+
+#government #government-interview img {
+    width: 100%;
+    height: auto;
+}
+
+#news {
+    background-image: url(http://website.ruubypay.com/folding/img/bg7-8.jpg?imageView2/2/w/400);
+    background-size: cover;
+}
+
+#news .bg-gradient {
+    background-image: linear-gradient(135deg, #DF89B5, #BFD9FE);
+}
+
+#news .content-video {
+    top: 8%;
+}
+
+#news .content-video:nth-of-type(2) {
+    top: 50%;
+}
+
+#future-vision {
+    background-image: url(http://website.ruubypay.com/folding/img/bg9.jpg?imageView2/2/w/300);
+    background-size: cover;
+}
+
+#future-vision .bg-gradient {
+    background-image: linear-gradient(135deg, #B521FF 0%, #21D2FB 100%);
+}
+
+#future-vision .content-p {
+    top: 10%;
+    text-align: left;
+}
+
+#future-vision .content-video {
+    top: 44%;
+}
+
+#ending {
+    background-image: url(http://website.ruubypay.com/folding/img/bg10.jpg?imageView2/2/w/300);
+    background-size: cover;
+}
+
+#ending .bg-gradient {
+    background-image: linear-gradient(135deg, #ED6EA0 0%, #EC8C69 100%);
+}
+
+#ending .section-content {
+    top: 0;
+    height: 100%;
+}
+
+#ending #top-img {
+    top: 5%;
+}
+
+#ending #top-img img {
+    width: 100%;
+}
+
+#ending .content-title {
+    top: 36.6%;
+    text-align: left;
+}
+
+#ending .content-p {
+    top: 44%;
+}
+
+#ending #qrcode {
+    top: 66%;
+    bottom: 8%;
+}

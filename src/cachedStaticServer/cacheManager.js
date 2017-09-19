@@ -93,6 +93,7 @@ class ResourceCachePack {
 		this._size = 0;
 		this.created = 0;
 		this.updated = 0;
+		this.cached = false;
 	}
 }
 class ResourceManager extends global.Utils.EventManager {
