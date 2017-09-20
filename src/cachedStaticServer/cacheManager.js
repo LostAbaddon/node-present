@@ -16,8 +16,8 @@ const DefaultConfig = {
 		accept: ['text', 'javascript', 'json']
 	},
 	interval: {
-		"arrange": "1s",
-		"checkout": "1m"
+		"arrange": "1m",
+		"checkout": "10m"
 	}
 };
 
@@ -252,8 +252,8 @@ class ResourceManager extends global.Utils.EventManager {
 			res();
 		});
 	}
-	arrange () {
-		console.log('>>>>....');
+	async arrange () {
+		console.time('Arrange');
 		var map = [];
 		Object.keys(this.storage).map(c => {
 			var d = this.storage[c];
@@ -263,13 +263,13 @@ class ResourceManager extends global.Utils.EventManager {
 				size: d.size / 1024 // 体积以KB为单位
 			});
 		});
-		map = global.Utils.Algorithm.arrangeRoom(map, this.config.mem.totalLimit / 1024);
+		map = await global.Utils.Algorithm.arrangeRoom(map, this.config.mem.totalLimit / 1024);
 		map.map(c => {
 			var r = c.value, s = c.size;
 			c = c.key;
 			c = this.storage[c];
-			console.log(c.realpath, r, s, c.visit);
 		});
+		console.timeEnd('Arrange');
 		setTimeout(() => {
 			this.arrange();
 		}, this.config.interval.arrange);

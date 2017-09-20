@@ -42,6 +42,10 @@ v0.1.0（开发中）
 		"totalLimit": "10M",
 		"singleLimit": "100K",
 		"accept": ["text", "javascript", "json"]
+	},
+	"interval": {
+		"arrange": "1m",
+		"checkout": "10m"
 	}
 }
 ```
@@ -62,6 +66,7 @@ v0.1.0（开发中）
 	-	Config文件的动态热更新
 	-	更优的静态资源变更管理（使用文件内容的HASH判断文件是否改名）
 	-	七牛云与阿里OSS的自动上传组件
+	-	系统性能监控，Console级
 
 ----
 

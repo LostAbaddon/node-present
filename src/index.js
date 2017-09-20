@@ -197,6 +197,14 @@ const server = config => {
 	app.config = config;
 	app.listen(config.port);
 
+	// 全局未处理错误处理
+	process.on('uncaughtException', (err) => {
+		error(err.stack);
+	});
+	process.on('unhandledRejection', (reason, p) => {
+		error(reason.stack);
+	});
+
 	log('Server Started...');
 };
 
