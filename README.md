@@ -15,12 +15,13 @@
 
 依赖库：
 
--	NodeJS 8.3
+-	NodeJS 8.5
 -	Express 4.15
 -	Mime 1.3.4
 -	Multer 1.3
 -	Body-Parser 1.17
 -	Cookie-Parser 1.4.3
+-	WebWorker-Threads 0.7.13
 
 ----
 

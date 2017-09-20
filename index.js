@@ -45,7 +45,7 @@ const server = config => {
 	return server;
 };
 
-server.VERSION = '0.0.1';
+server.VERSION = '0.1.0';
 server.AUTHOR = 'LostAbaddon';
 server.DESCRIPTION = 'Simple Web Server';
 

@@ -17,6 +17,7 @@ const FS = require('fs');
 const Path = require('path');
 require('./moduleManager');
 require('./eventManager');
+require('./threadManager');
 require('./algorithm');
 
 global.Utils = global.Utils || {};
