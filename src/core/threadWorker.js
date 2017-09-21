@@ -1,14 +1,11 @@
-console.log('Start Thread');
-try {
-	setTimeout(() => {
-		console.log('XXXXXXXXXXoooooooooXXXXXXXXXX');
-	}, 1000);
-}
-catch (err) {
-	console.error(err.message);
-}
-
 var CurrentQuest = null;
+
+this.setImmediate = cb => {
+	thread.nextTick(cb);
+};
+this.setTimeout = (cb, delay) => {
+	
+};
 
 this.finish = msg => {
 	console.log('Finish: ' + CurrentQuest);
@@ -58,3 +55,20 @@ this.onmessage = (data) => {
 	// }, 2000);
 	console.log('!!!!');
 };
+
+// Main Code Part Below
+
+console.log('Start Thread');
+setImmediate(() => console.log(1));
+console.log(2)
+console.log('VVVVVVVVVVVVVVVVVVV');
+
+// try {
+// 	setTimeout(() => {
+// 		console.log('XXXXXXXXXXoooooooooXXXXXXXXXX');
+// 	}, 1000);
+// }
+// catch (err) {
+// 	console.error(err.message);
+// }
+

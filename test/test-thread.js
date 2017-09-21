@@ -1,6 +1,6 @@
 const { fork } = require('child_process');
-// const ThreadPool = require('../src/core/threadManager');
 const Thread = require('webworker-threads');
+const ThreadPool = require('../src/core/threadManager');
 const MaxLoop = require('./fto');
 const Max = 500000;
 const Times = 20;
@@ -124,8 +124,6 @@ var taskCluster = (times, pool, cb) => {
 		calltask();
 	}
 };
-
-taskThread(1);
 
 return;
 
