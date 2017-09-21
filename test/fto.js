@@ -29,11 +29,20 @@ var maxLoop = max => {
 	return [m, n];
 };
 
+if (!!this.postMessage) {
+	this.onmessage = (data) => {
+		this.postMessage(maxLoop(data.data));
+	};
+}
 try {
-	if (!!self) {
-		self.onmessage = (data) => {
-			self.postMessage(maxLoop(data.data));
-		};
+	if (!!process) {
+		process.on('message', msg => {
+			if (msg.action !== 'maxloop') return;
+			process.send({
+				action: 'done',
+				data: maxLoop(msg.data)
+			});
+		});
 	}
 }
 catch (err) {}
