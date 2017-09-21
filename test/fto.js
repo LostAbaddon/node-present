@@ -1,3 +1,17 @@
+try {
+	let thread = this.thread;
+	console.log(111, thread.id);
+	setTimeout(() => {
+		console.log(113, thread.id);
+	}, 1000);
+	console.log(112, thread.id);
+}
+catch (err) {
+	console.error(err.message);
+}
+console.log(Object.keys(this).join('; '));
+console.log(Object.keys(this.thread).join('; '));
+
 // Four Two One Loop
 
 var dealNum = num => {
@@ -29,11 +43,20 @@ var maxLoop = max => {
 	return [m, n];
 };
 
+if (!!this.postMessage) {
+	this.onmessage = (data) => {
+		this.postMessage(maxLoop(data.data));
+	};
+}
 try {
-	if (!!self) {
-		self.onmessage = (data) => {
-			self.postMessage(maxLoop(data.data));
-		};
+	if (!!process) {
+		process.on('message', msg => {
+			if (msg.action !== 'maxloop') return;
+			process.send({
+				action: 'done',
+				data: maxLoop(msg.data)
+			});
+		});
 	}
 }
 catch (err) {}
