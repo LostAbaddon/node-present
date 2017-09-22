@@ -41,37 +41,42 @@ Thread.createPool = n => {
 
 // 线程池参数
 const CPUCount = require('os').cpus().length;
-const ThreadPerCPU = 2;
+const ThreadPerCPU = 10;
 const PoolLimit = CPUCount * ThreadPerCPU;
 
-const elfSoul = __dirname + '/threadWorker.js';
+const elfSoul = __dirname + '/threads/threadWorker.js';
 const freeWorld = [];
 const battleField = [];
 
 // 封装的Worker类
 class Deacon {
 	constructor (soul) {
+		var ego = this;
 		soul = soul || elfSoul;
-		this.soul = new Thread.Worker(soul);
-		this.soul.isfree = true;
-		this.soul.onmessage = msg => {
+		ego.soul = new Thread.Worker(soul);
+		ego.soul.isfree = true;
+		ego.soul.onmessage = msg => {
 			msg = msg.data;
-			if (!!this.messager) {
+			if (!!ego.messager) {
 				if (msg.action === 'complete') {
-					this.reaper({
-						quest: this.quest,
+					ego.reaper({
+						quest: ego.quest,
 						msg: msg.data
 					});
 				}
 				else {
-					this.messager({
-						quest: this.quest,
+					ego.messager({
+						quest: ego.quest,
 						msg: msg
 					});
 				}
 			}
 		};
-		freeWorld.push(this);
+		ego.soul.postMessage({
+			action: 'init',
+			data: __dirname
+		});
+		freeWorld.push(ego);
 	}
 	get isFree () {
 		return this.soul.isfree;
