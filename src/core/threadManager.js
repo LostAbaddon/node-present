@@ -41,7 +41,7 @@ Thread.createPool = n => {
 
 // 线程池参数
 const CPUCount = require('os').cpus().length;
-const ThreadPerCPU = 2;
+const ThreadPerCPU = 10;
 const PoolLimit = CPUCount * ThreadPerCPU;
 
 const elfSoul = __dirname + '/threadWorker.js';

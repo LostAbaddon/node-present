@@ -1,12 +1,43 @@
-var CurrentQuest = null;
-
+const timerPool = [];
+const getStamp = () => new Date().getTime();
+const dispatchTask = (task) => {
+	var shouldStart = (timerPool.length === 0);
+	timerPool.push(task);
+};
 this.setImmediate = cb => {
-	thread.nextTick(cb);
+	var data = {
+		tag: 0,
+		func: cb,
+		expire: getStamp(),
+		keep: false,
+		delay: true
+	};
+	dispatchTask(data);
 };
 this.setTimeout = (cb, delay) => {
-	
+	delay = (delay * 1) || 0;
+	var data = {
+		tag: 1,
+		func: cb,
+		expire: getStamp() + delay,
+		keep: false,
+		delay: true
+	};
+	dispatchTask(data);
+};
+this.setInterval = (cb, delay, delayMode) => {
+	delay = (delay * 1) || 0;
+	var data = {
+		tag: 2,
+		func: cb,
+		expire: getStamp() + delay,
+		keep: true,
+		delay: !delayMode ? true : false
+	};
+	dispatchTask(data);
 };
 
+var CurrentQuest = null;
 this.finish = msg => {
 	console.log('Finish: ' + CurrentQuest);
 	if (CurrentQuest === null) return;
