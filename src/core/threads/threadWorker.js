@@ -1,6 +1,23 @@
 var CurrentQuest = null;
 var CurrentPath = '';
 
+var attachScript = path => {
+	if (!path) return;
+	if (path.substr(0, 1) !== '/') {
+		path = CurrentPath + '/' + path;
+	}
+	try {
+		importScripts(path);
+	}
+	catch (err) {
+		console.error('Import Script Error:', path);
+		__postError({
+			type: 'import_script_error',
+			msg: err.message,
+			data: path
+		});
+	}
+};
 var init = (filelist, loglev) => {
 	importScripts(CurrentPath + '/extend.js');
 	importScripts(CurrentPath + '/datetime.js');
@@ -10,21 +27,7 @@ var init = (filelist, loglev) => {
 	setLogLev(loglev);
 
 	filelist.map(path => {
-		if (!path) return;
-		if (path.substr(0, 1) === '.') {
-			path = CurrentPath + '/' + path;
-		}
-		try {
-			importScripts(path);
-		}
-		catch (err) {
-			console.error('Import Script Error:', path);
-			__postError({
-				type: 'import_script_error',
-				msg: err.message,
-				data: path
-			});
-		}
+		attachScript(path);
 	});
 };
 
@@ -50,21 +53,13 @@ this.onmessage = (data) => {
 	if (data.action === 'init') {
 		CurrentPath = data.path;
 		init(data.filelist, data.loglev);
-		try {
-			setInterval(() => {
-				console.log('<<<<');
-				self.post('>>>>');
-			}, 1000);
-		}
-		catch (err) {
-			console.error(err.message);
-		}
+	}
+	else if (data.action === 'attach') {
+		attachScript(data.script);
 	}
 	else if (data.action === 'quest') {
 		CurrentQuest = data.quest;
 	}
 	else if (data.action === 'message') {
 	}
-
-	// self.post('?????');
 };
