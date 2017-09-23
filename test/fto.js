@@ -46,5 +46,7 @@ try {
 	}
 }
 catch (err) {}
-
-module.exports = maxLoop;
+try {
+	module.exports = maxLoop;
+}
+catch (err) {}

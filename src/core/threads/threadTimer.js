@@ -1,4 +1,4 @@
-(function (self, thread) {
+((self, thread) => {
 	self.AllTimerTag = Symbol('AllTimerTag');
 	const timerPool = [];
 	const getStamp = () => new Date().getTime();
@@ -22,7 +22,7 @@
 			if (task.tag === 2 && task.delay !== 2) {
 				t = task.delay === 0 ? now : getStamp();
 			}
-			task.func.call({});
+			task.func();
 			if (task.tag === 2 && task.delay == 2) {
 				t = getStamp();
 			}

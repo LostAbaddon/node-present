@@ -50,7 +50,7 @@ const battleField = [];
 
 // 封装的Worker类
 class Deacon {
-	constructor (soul) {
+	constructor (soul, ghosts) {
 		var ego = this;
 		soul = soul || elfSoul;
 		ego.soul = new Thread.Worker(soul);
@@ -59,6 +59,10 @@ class Deacon {
 			msg = msg.data;
 			if (!!ego.messager) {
 				if (msg.action === 'complete') {
+					ego.soul.isfree = true;
+					var index = battleField.indexOf(ego);
+					if (index >= 0) battleField.splice(index, 1);
+					freeWorld.push(ego);
 					ego.reaper({
 						quest: ego.quest,
 						msg: msg.data
@@ -72,9 +76,14 @@ class Deacon {
 				}
 			}
 		};
+		ego.soul.thread.on('error', err => {
+			console.error('Error:::');
+			console.error(err);
+		});
 		ego.soul.postMessage({
 			action: 'init',
-			data: __dirname
+			path: __dirname,
+			filelist: ghosts
 		});
 		freeWorld.push(ego);
 	}
@@ -85,6 +94,10 @@ class Deacon {
 		this.quest = quest;
 		this.messager = messager;
 		this.reaper = reaper;
+		this.soul.isfree = false;
+		var index = freeWorld.indexOf(this);
+		if (index >= 0) freeWorld.splice(index, 1);
+		battleField.push(this);
 		this.soul.postMessage({
 			action: 'quest',
 			quest: quest,
@@ -107,7 +120,7 @@ class Deacon {
 	}
 }
 
-var deacon = new Deacon();
+var deacon = new Deacon(null, [ '', '../../test/fto.js', '/Users/lostabaddon/Documents/MyWorld/Codes/Present/test/fto.js' ]);
 deacon.dispatch('Test Quest', { title: 'Fuck', target: 'SlowTheBitch' }, msg => {
 	console.log('Messager >>>>');
 	console.log(msg);
