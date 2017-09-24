@@ -1,3 +1,11 @@
+/**
+ * Name:	Auxillary Utils and Extends
+ * Desc:    常用基础类拓展
+ * Author:	LostAbaddon
+ * Version:	0.0.1
+ * Date:	2017.09.23
+ */
+
 // Strng Extends
 
 String.prototype.prepadding = function (len, padding) {

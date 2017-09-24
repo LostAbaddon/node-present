@@ -1,9 +1,65 @@
 var CurrentQuest = null;
 var CurrentPath = '';
 
+// For Task Done
+this.finish = msg => {
+	if (CurrentQuest === null) return;
+	postMessage({
+		quest: CurrentQuest,
+		action: 'complete',
+		data: msg
+	});
+	CurrentQuest = null;
+};
+// For Message
+this.post = msg => {
+	if (CurrentQuest === null) return;
+	postMessage({
+		quest: CurrentQuest,
+		action: 'message',
+		msg: msg
+	});
+};
+// For Errors
+this.report = (type, msg, data) => {
+	__postError({
+		type: type,
+		msg: msg.replace(/(^\n*|\n*$)/gi, ''),
+		data: data
+	});
+};
+
+/*
+task class structure:
+{
+	quest: String,
+	worker: Async Function, return null for async.
+	onmessage: Function: msg => {}
+}
+ */
+((global) => {
+	var tasks = {}; // For thread-tasks, key-task pair	
+
+	global.register = task => {
+		tasks[task.quest] = task;
+	};
+	global.invoke = async (quest, opt) => {
+		quest = tasks[quest];
+		if (!quest) return;
+		var result = await quest.worker(opt);
+		if (!result) return;
+		finish(result);
+	};
+	global.transfer = (quest, opt) => {
+		quest = tasks[quest];
+		if (!quest) return;
+		quest.onmessage(opt);
+	};
+}) (this);
+
 var attachScript = path => {
 	if (!path) return;
-	if (path.substr(0, 1) !== '/') {
+	if (path.substr(0, 1) === '.') {
 		path = CurrentPath + '/' + path;
 	}
 	try {
@@ -11,11 +67,7 @@ var attachScript = path => {
 	}
 	catch (err) {
 		console.error('Import Script Error:', path);
-		__postError({
-			type: 'import_script_error',
-			msg: err.message,
-			data: path
-		});
+		report('import_script_error', err.message, path);
 	}
 };
 var init = (filelist, loglev) => {
@@ -31,23 +83,7 @@ var init = (filelist, loglev) => {
 	});
 };
 
-this.finish = msg => {
-	if (CurrentQuest === null) return;
-	this.postMessage({
-		action: 'complete',
-		data: msg
-	});
-	CurrentQuest = null;
-};
-this.post = msg => {
-	if (CurrentQuest === null) return;
-	this.postMessage({
-		quest: CurrentQuest,
-		msg: msg
-	});
-};
-
-// 与主线程通讯
+// Communicate with Process
 this.onmessage = (data) => {
 	data = data.data;
 	if (data.action === 'init') {
@@ -59,7 +95,9 @@ this.onmessage = (data) => {
 	}
 	else if (data.action === 'quest') {
 		CurrentQuest = data.quest;
+		invoke(data.quest, data.data);
 	}
 	else if (data.action === 'message') {
+		transfer(CurrentQuest, data.data);
 	}
 };

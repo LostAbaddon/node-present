@@ -1,5 +1,6 @@
 const { fork } = require('child_process');
 const Thread = require('webworker-threads');
+require('../src/');
 const ThreadPool = require('../src/core/threadManager');
 // const MaxLoop = require('./fto');
 const Max = 500000;

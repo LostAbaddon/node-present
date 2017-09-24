@@ -15,25 +15,25 @@
 	var loglev = 0;
 	var console_info = function () {
 		if (loglev <= 1) {
-			[].unshift.call(arguments, '[INFO (' + timeNormalize() + ')]');
+			[].unshift.call(arguments, '[INFO (T-' + thread.id + ' ' + timeNormalize() + ')]');
 			_log(combine.apply(console, arguments));
 		}
 	};
 	var console_log = function () {
 		if (loglev <= 2) {
-			[].unshift.call(arguments, '[LOG  (' + timeNormalize() + ')]');
+			[].unshift.call(arguments, '[LOG  (T-' + thread.id + ' ' + timeNormalize() + ')]');
 			_log(combine.apply(console, arguments));
 		}
 	};
 	var console_warn = function () {
 		if (loglev <= 3) {
-			[].unshift.call(arguments, '[WARN (' + timeNormalize() + ')]');
+			[].unshift.call(arguments, '[WARN (T-' + thread.id + ' ' + timeNormalize() + ')]');
 			_error(combine.apply(console, arguments));
 		}
 	};
 	var console_error = function () {
 		if (loglev <= 4) {
-			[].unshift.call(arguments, '[ERROR(' + timeNormalize() + ')]');
+			[].unshift.call(arguments, '[ERROR(T-' + thread.id + ' ' + timeNormalize() + ')]');
 			_error(combine.apply(console, arguments));
 		}
 	};

@@ -13,50 +13,17 @@
  * Object的copy与extent功能
  */
 
+global.Utils = global.Utils || {};
+
 const FS = require('fs');
 const Path = require('path');
 require('./extend');
 require('./datetime');
+require('./logger');
+require('./algorithm');
 require('./moduleManager');
 require('./eventManager');
 require('./threadManager');
-require('./algorithm');
-
-global.Utils = global.Utils || {};
-
-const timeNormalize = global.Utils.getTimeString;
-global.logger = loglev => {
-	var info = function () {
-		if (loglev <= 1) {
-			[].unshift.call(arguments, '[INFO (' + timeNormalize() + ')]');
-			console.info.apply(console, arguments);
-		}
-	};
-	var log = function () {
-		if (loglev <= 2) {
-			[].unshift.call(arguments, '[LOG  (' + timeNormalize() + ')]');
-			console.log.apply(console, arguments);
-		}
-	};
-	var warn = function () {
-		if (loglev <= 3) {
-			[].unshift.call(arguments, '[WARN (' + timeNormalize() + ')]');
-			console.warn.apply(console, arguments);
-		}
-	};
-	var error = function () {
-		if (loglev <= 4) {
-			[].unshift.call(arguments, '[ERROR(' + timeNormalize() + ')]');
-			console.error.apply(console, arguments);
-		}
-	};
-	return {
-		info: info,
-		log: log,
-		warn: warn,
-		error: error
-	}
-};
 
 global.Utils.preparePath = async (path, cb) => {
 	var has = FS.access(path, (err) => {

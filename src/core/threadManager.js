@@ -50,8 +50,10 @@ const battleField = [];
 
 // 封装的Worker类
 class Deacon {
-	constructor (soul, ghosts) {
+	constructor (soul, ghosts, loglev) {
 		var ego = this;
+		loglev = loglev || 0;
+		var logger = global.logger(loglev);
 		soul = soul || elfSoul;
 		ego.soul = new Thread.Worker(soul);
 		ego.soul.isfree = true;
@@ -63,27 +65,31 @@ class Deacon {
 					var index = battleField.indexOf(ego);
 					if (index >= 0) battleField.splice(index, 1);
 					freeWorld.push(ego);
-					ego.reaper({
-						quest: ego.quest,
+					if (!!ego.reaper) ego.reaper({
+						quest: msg.quest,
 						msg: msg.data
 					});
+					ego.messager = null;
+					ego.reaper = null;
 				}
-				else {
-					ego.messager({
-						quest: ego.quest,
-						msg: msg
+				else if (msg.action === 'message') {
+					if (!!ego.messager) ego.messager({
+						quest: msg.quest,
+						msg: msg.msg
 					});
 				}
 			}
 		};
 		ego.soul.thread.on('error', err => {
-			console.error('Error:::');
-			console.error(err);
+			logger.error("Thread " + ego.soul.thread.id + " Error: (" + err.type + ")");
+			logger.error(err.msg);
+			logger.error(err.data);
 		});
 		ego.soul.postMessage({
 			action: 'init',
 			path: __dirname,
-			filelist: ghosts
+			filelist: ghosts,
+			loglev: loglev
 		});
 		freeWorld.push(ego);
 	}
@@ -91,7 +97,6 @@ class Deacon {
 		return this.soul.isfree;
 	}
 	dispatch (quest, data, messager, reaper) {
-		this.quest = quest;
 		this.messager = messager;
 		this.reaper = reaper;
 		this.soul.isfree = false;
@@ -114,20 +119,41 @@ class Deacon {
 	}
 	suicide () {
 		if (!this.soul.isfree) return false;
+		this.soul.isfree = false;
 		freeWorld.splice(freeWorld.indexOf(this), 1);
 		this.soul.terminate();
 		return true;
 	}
+	attach (script) {
+		var len = script.length;
+		if (script.indexOf('\n') >= 0 || script.substring(len - 3, len).toLowerCase() !== '.js') {
+			this.soul.thread.eval(script);
+		}
+		else {
+			this.soul.thread.load(script);
+		}
+	}
+	onmessage (cb) {
+		this.messager = cb;
+		return this;
+	}
+	onfinish (cb) {
+		this.reaper = cb;
+		return this;
+	}
 }
 
-var deacon = new Deacon(null, [ '', '../../test/fto.js', '/Users/lostabaddon/Documents/MyWorld/Codes/Present/test/fto.js' ]);
-deacon.dispatch('Test Quest', { title: 'Fuck', target: 'SlowTheBitch' }, msg => {
+var deacon = new Deacon(null, [ process.cwd() + '/../example/tasks/thread-task.js' ], 1);
+deacon.dispatch('Science', { title: 'Fuck', target: 'SlowTheBitch' }, msg => {
 	console.log('Messager >>>>');
 	console.log(msg);
 }, msg => {
 	console.log('Reaper >>>>');
 	console.log(msg);
 }).submit('What The Fuck!!!');
+setTimeout(() => {
+	deacon.attach('console.log(CurrentQuest);report("What", "The", "Fuck");console.log("??????")');
+}, 1000);
 
 return;
 

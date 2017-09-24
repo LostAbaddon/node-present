@@ -1,3 +1,11 @@
+/**
+ * Name:	Auxillary Utils and Extends for DateTime
+ * Desc:    日期时间相关拓展
+ * Author:	LostAbaddon
+ * Version:	0.0.1
+ * Date:	2017.09.23
+ */
+
 const getDTMatch = (format, match, lim, def) => {
 	if (isNaN(def)) def = lim;
 	var temp = format.match(match);
