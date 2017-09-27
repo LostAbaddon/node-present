@@ -64,6 +64,7 @@ v0.1.0（开发中）
 10.	WebSocket用的WebAPI（开发中）
 11.	辅助工具
 	-	优化的事件管理系统：Utils.EventManager
+	-	Chalk实现console美化（基于Ansi-Styles库与Chalk库）
 12.	下一步
 	-	Redis级缓存
 	-	更好的类型判别工具（用于所有需要判断类型的地方）

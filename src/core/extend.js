@@ -2,7 +2,7 @@
  * Name:	Auxillary Utils and Extends
  * Desc:    常用基础类拓展
  * Author:	LostAbaddon
- * Version:	0.0.1
+ * Version:	0.0.2
  * Date:	2017.09.23
  */
 
@@ -44,3 +44,6 @@ Object.prototype.extent = function (...targets) {
 Array.prototype.copy = function () {
 	return this.map(ele => ele);
 };
+Object.defineProperty(Object.prototype, 'copy', { enumerable: false });
+Object.defineProperty(Object.prototype, 'extent', { enumerable: false });
+Object.defineProperty(Array.prototype, 'copy', { enumerable: false });
