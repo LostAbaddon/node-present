@@ -6,6 +6,7 @@
  * Date:	2017.09.21
  *
  * 基于 WebWorker-Threads 的线程管理中心
+ * 实现分组线程池
  */
 
 // 对WebWorker-Threads的拓展
@@ -41,16 +42,16 @@ Thread.createPool = n => {
 
 // 线程池参数
 const CPUCount = require('os').cpus().length;
-const ThreadPerCPU = 10;
+const ThreadPerCPU = 5;
 const PoolLimit = CPUCount * ThreadPerCPU;
 
 const elfSoul = __dirname + '/threads/threadWorker.js';
-const freeWorld = [];
-const battleField = [];
 
 // 封装的Worker类
 class Deacon {
-	constructor (soul, ghosts, loglev) {
+	constructor (freeWorld, battleField, soul, ghosts, loglev) {
+		this.freeWorld = freeWorld;
+		this.battleField = battleField;
 		var ego = this;
 		loglev = loglev || 0;
 		var logger = global.logger(loglev);
@@ -62,9 +63,9 @@ class Deacon {
 			if (!!ego.messager) {
 				if (msg.action === 'complete') {
 					ego.soul.isfree = true;
-					var index = battleField.indexOf(ego);
-					if (index >= 0) battleField.splice(index, 1);
-					freeWorld.push(ego);
+					var index = ego.battleField.indexOf(ego);
+					if (index >= 0) ego.battleField.splice(index, 1);
+					ego.freeWorld.push(ego);
 					if (!!ego.reaper) ego.reaper({
 						quest: msg.quest,
 						msg: msg.data
@@ -91,7 +92,7 @@ class Deacon {
 			filelist: ghosts,
 			loglev: loglev
 		});
-		freeWorld.push(ego);
+		ego.freeWorld.push(ego);
 	}
 	get isFree () {
 		return this.soul.isfree;
@@ -100,9 +101,9 @@ class Deacon {
 		this.messager = messager;
 		this.reaper = reaper;
 		this.soul.isfree = false;
-		var index = freeWorld.indexOf(this);
-		if (index >= 0) freeWorld.splice(index, 1);
-		battleField.push(this);
+		var index = this.freeWorld.indexOf(this);
+		if (index >= 0) this.freeWorld.splice(index, 1);
+		this.battleField.push(this);
 		this.soul.postMessage({
 			action: 'quest',
 			quest: quest,
@@ -120,7 +121,7 @@ class Deacon {
 	suicide () {
 		if (!this.soul.isfree) return false;
 		this.soul.isfree = false;
-		freeWorld.splice(freeWorld.indexOf(this), 1);
+		this.freeWorld.splice(this.freeWorld.indexOf(this), 1);
 		this.soul.terminate();
 		return true;
 	}
@@ -143,44 +144,65 @@ class Deacon {
 	}
 }
 
-var deacon = new Deacon(null, [ process.cwd() + '/../example/tasks/thread-task.js' ], 1);
-deacon.dispatch('Science', { title: 'Fuck', target: 'SlowTheBitch' }, msg => {
-	console.log('Messager >>>>');
-	console.log(msg);
-}, msg => {
-	console.log('Reaper >>>>');
-	console.log(msg);
-}).submit('What The Fuck!!!');
-setTimeout(() => {
-	deacon.attach('console.log(CurrentQuest);report("What", "The", "Fuck");console.log("??????")');
-}, 1000);
-
-return;
-
-
-var pool = [];
+var PoolSize = 0;
+var group = {};
 const ThreadPool = {
+	init:  (option) => {
+		if (!option) option = {};
+		var total_size = 0;
+		var group_count = 0;
+		for (let g in option) {
+			total_size += option[g];
+			group_count += 1;
+		}
+		var default_size = 0;
+		if (total_size < PoolLimit) { // 剩余的作为默认线程池
+			default_size = PoolLimit - total_size;
+		}
+		else if (group_count > PoolLimit) { // 全部放在默认线程池中
+			default_size = PoolLimit;
+			for (let g in option) option[g] = 0;
+		}
+		else {
+
+		}
+		console.log(total_size, group_count, PoolLimit);
+	},
+	initxxx: (size) => {
+		if (isNaN(size)) size = PoolLimit;
+		else {
+			size = Math.floor(size);
+			if (size > PoolLimit) size = PoolLimit;
+			else if (size < 1) size = 1;
+		}
+		PoolSize = size;
+		this.group = {
+			default: {
+				size: size,
+				free: [],
+				busy: []
+			}
+		};
+	},
+	alloc: (alloc) => {
+
+	},
 	get size () {
-		return pool.length;
-	}
-};
-ThreadPool.init = size => {
-	if (isNaN(size)) size = PoolLimit;
-	else {
-		size = Math.floor(size);
-		if (size > PoolLimit) size = PoolLimit;
-		else if (size < 1) size = 1;
-	}
-	for (let i = 0; i < size; i ++) {
-		let thread = Thread.create();
-		pool.push(thread);
+		return PoolSize;
+	},
+	get SizeLimit () {
+		return PoolLimit;
 	}
 };
 ThreadPool.addTask = (order, task) => {
 
 };
 
-console.log(ThreadPool);
+ThreadPool.init({
+	deamon: 13,
+	hulk: 24,
+	ironman: 11
+});
 
 ThreadPool.Thread = Thread;
 

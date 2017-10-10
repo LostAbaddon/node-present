@@ -18,16 +18,16 @@ global.logger = (loglev, colors) => {
 	var info = function () {
 		if (loglev <= 1) {
 			[].unshift.call(arguments, '[INFO (' + timeNormalize() + ')]');
-			[].unshift.call(arguments, colors.warn.open);
-			[].push.call(arguments, colors.warn.close);
+			[].unshift.call(arguments, colors.info.open);
+			[].push.call(arguments, colors.info.close);
 			console.info.apply(console, arguments);
 		}
 	};
 	var log = function () {
 		if (loglev <= 2) {
 			[].unshift.call(arguments, '[LOG  (' + timeNormalize() + ')]');
-			[].unshift.call(arguments, colors.warn.open);
-			[].push.call(arguments, colors.warn.close);
+			[].unshift.call(arguments, colors.log.open);
+			[].push.call(arguments, colors.log.close);
 			console.log.apply(console, arguments);
 		}
 	};

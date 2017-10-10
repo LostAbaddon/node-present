@@ -1,3 +1,5 @@
+// One Thread, One Task
+
 var CurrentQuest = null;
 var CurrentPath = '';
 
@@ -44,16 +46,23 @@ task class structure:
 		tasks[task.quest] = task;
 	};
 	global.invoke = async (quest, opt) => {
-		quest = tasks[quest];
-		if (!quest) return;
-		var result = await quest.worker(opt);
+		var q = tasks[quest];
+		if (!q) {
+			report('no_such_quest', "No Such Quest: " + quest, { type: 'invoke', quest: quest });
+			return;
+		}
+		var result = await q.worker(opt);
 		if (!result) return;
 		finish(result);
 	};
 	global.transfer = (quest, opt) => {
-		quest = tasks[quest];
-		if (!quest) return;
-		quest.onmessage(opt);
+		var q = tasks[quest];
+		if (!q) {
+			report('no_such_quest', "No Such Quest: " + quest, { type: 'message', quest: quest });
+			return;
+		}
+		if (!q) return;
+		q.onmessage(opt);
 	};
 }) (this);
 
