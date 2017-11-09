@@ -8,6 +8,7 @@
 
 const RegRawStyle = /[\u001b].*?m/g;
 
+const fs = require('fs');
 const ReadLine = require('readline');
 
 const setStyle = require('./setConsoleStyle');
@@ -23,6 +24,61 @@ const DefaultHints = {
 	probarFGStyle: 'bgGreen',
 	welcome: 'Welcome!',
 	byebye: 'Byebye...'
+};
+const CommandHistory = {
+	records: [],
+	trigger: null,
+	delay: 1000 * 60 * 10,
+	room: 10,
+	limit: 1000,
+	storage: '/commands.history',
+	push: (command) => {
+		command = command.trim();
+		if (CommandHistory.records[CommandHistory.records.length - 1] === command) return;
+		CommandHistory.records.push(command);
+		if (!!CommandHistory.trigger) clearTimeout(CommandHistory.trigger);
+		if (CommandHistory.records.length >= CommandHistory.room) {
+			CommandHistory.save();
+		}
+		else {
+			CommandHistory.trigger = setTimeout(CommandHistory.save, CommandHistory.delay);
+		}
+	},
+	save: () => new Promise((res, rej) => {
+		var rec = CommandHistory.records.copy();
+		if (rec.length === 0) {
+			res();
+			return;
+		}
+		fs.appendFile(process.env.PWD + CommandHistory.storage, rec.join('\n') + '\n', { encoding: 'utf8' }, async err => {
+			if (!err) {
+				CommandHistory.records.splice(0, rec.length);
+			}
+			setImmediate(res);
+		});
+	}),
+	load: (cli) => new Promise((res, rej) => {
+		fs.readFile(process.env.PWD + CommandHistory.storage, (err, data) => {
+			if (!!err) return;
+			var commands = data.toString();
+			commands = commands.replace(/^[ \n\r\t]*|[ \n\r\t]*$/g, '');
+			commands = commands.split('\n').map(c => c.trim());
+			if (commands.length > CommandHistory.limit) {
+				commands.splice(0, commands.length - CommandHistory.limit);
+			}
+			var last = '', list = [];
+			commands.forEach(c => {
+				if (c === last) return;
+				last = c;
+				list.push(c);
+				cli.history.unshift(c);
+			});
+			list = list.join('\n') + '\n';
+			fs.writeFile(process.env.PWD + CommandHistory.storage, list, { encoding: 'utf8' }, err => {
+				res();
+			});
+		});
+	})
 };
 
 class CLI {
@@ -56,19 +112,28 @@ class CLI {
 		this.processLength = 0;
 		this.processPercent = [];
 		this.waitingInput = false;
+		this.shouldClearLine = false;
 
 		ReadLine.emitKeypressEvents(process.stdin);
-		process.stdin.setEncoding('utf8');
-		process.stdin.setRawMode(true);
-		process.stdin.on('keypress', (chunk, key) => {
+		if (!!process.stdin.setEncoding) process.stdin.setEncoding('utf8');
+		if (!!process.stdin.setRawMode) process.stdin.setRawMode(true);
+		process.stdin.on('keypress', async (chunk, key) => {
 			if (key && key.ctrl && key.name == 'c') {
 				this.waiting = false;
-				this.close();
+				await this.close();
 				setImmediate(() => {
 					if (this.exitCallback) this.exitCallback();
 				});
 			}
-			if (!this.waiting) return;
+			if (!this.waiting) {
+				if (key && key.ctrl && key.name == 'd') {
+					this.shouldClearLine = true;
+					setImmediate(() => {
+						this.rl.write('\r');
+					});
+				}
+				return;
+			}
 			if (key.name !== 'return') this.waitingInput = true;
 			var optionIndex = this.waitingOptions.indexOf(key.name);
 			if (key.name !== this.waitingKey && optionIndex < 0) {
@@ -142,6 +207,15 @@ class CLI {
 		this.rl = rl;
 
 		rl.on('line', line => {
+			if (this.shouldClearLine) {
+				this.shouldClearLine = false;
+				if (line.length > 0) {
+					this.rl.write('\r');
+				}
+				this.cursor(0, -1);
+				this.hint();
+				return;
+			}
 			if (this.shouldStopWaiting && this.waiting) {
 				this.waitingInput = false;
 				this.waiting = false;
@@ -166,9 +240,15 @@ class CLI {
 				let result;
 				if (!!this.requestCallback) {
 					result = this.requestCallback(line, this);
-					if (!!result && result.msg.length > 0 && !result.nohint) this.answer(result.msg);
+					if (!!result && result.msg && result.msg.length > 0 && !result.nohint) this.answer(result.msg);
 				}
 				if (!result || !result.nohint) this.hint();
+				if (!!result && result.norecord) {
+					rl.history.shift();
+				}
+				else {
+					CommandHistory.push(line);
+				}
 			}
 			else {
 				this.clear();
@@ -180,6 +260,8 @@ class CLI {
 
 		this.hint();
 		this.answer(this.hints.welcome);
+
+		CommandHistory.load(rl);
 	}
 	hint (hint) {
 		hint = hint || this.hints.hint;
@@ -208,10 +290,32 @@ class CLI {
 	}
 	clear (dir) {
 		ReadLine.clearLine(process.stdin, dir || 0);
+		// if (process.stdin.isTTY) try {
+		// 	ReadLine.clearLine(process.stdin, dir || 0);
+		// }
+		// catch (err) {}
 		return this;
 	}
 	cursor (dx, dy) {
 		ReadLine.moveCursor(process.stdin, dx, dy);
+		// if (process.stdin.isTTY) try {
+		// 	ReadLine.moveCursor(process.stdin, dx, dy);
+		// }
+		// catch (err) {}
+		return this;
+	}
+	stopInput () {
+		this.isInputStopped = true;
+		process.stdin.pause();
+		return this;
+	}
+	resumeInput () {
+		process.stdin.resume();
+		this.isInputStopped = false;
+		this.shouldClearLine = true;
+		setImmediate(() => {
+			this.rl.write('\r');
+		});
 		return this;
 	}
 	waitEnter (prompt, key) {
@@ -306,13 +410,17 @@ class CLI {
 		}
 	}
 	close (silence) {
-		if (!!this.quitCallback) this.quitCallback(this);
-		if (!silence) this.answer(this.hints.byebye);
-		setImmediate(() => {
-			this.clear();
-			this.cursor(-9999, 0);
-			this.rl.close();
-			process.stdin.destroy();
+		return new Promise(async (res, rej) => {
+			if (!!this.quitCallback) this.quitCallback(this);
+			if (!silence) this.answer(this.hints.byebye);
+			await CommandHistory.save();
+			res();
+			setImmediate(async () => {
+				this.clear();
+				this.cursor(-9999, 0);
+				await this.rl.close();
+				process.stdin.destroy();
+			});
 		});
 	}
 	onRequest (callback) {
@@ -331,6 +439,11 @@ class CLI {
 
 const Intereface = config => {
 	config = config || {};
+	config.history = config.history || {};
+	CommandHistory.delay = config.history.delay || CommandHistory.delay;
+	CommandHistory.room = config.history.room || CommandHistory.room;
+	CommandHistory.limit = config.history.limit || CommandHistory.limit;
+	CommandHistory.storage = config.history.storage || CommandHistory.storage;
 	var cli = new CLI(config.historySize, config.hints);
 	return cli;
 };

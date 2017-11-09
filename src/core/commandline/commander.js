@@ -37,20 +37,26 @@
 
 const EventEmitter = require('events');
 
-require('./extend');
+require('../extend');
 const setStyle = require('./setConsoleStyle');
 const cli = require('./cli');
+
+const RegMonoWidthChars = /[\x00-\xff–]+/g;
+const getCLLength = text => {
+	var len = text.length;
+	var ascii = text.match(RegMonoWidthChars);
+	if (!ascii) ascii = [''];
+	return len * 2 - ascii.join('').length;
+};
 
 const isDate = v => v.match(/^\d{2,4}-\d{1,2}-\d{1,2}(\/\d{1,2}:\d{1,2}(:\d{1,2}(\.\d+)?)?)?$/);
 const toRegExp = reg => new RegExp(reg);
 
-// 参数分隔，必须使用空格的时候，用“\ ”或者“[-space-]”代替
+// 参数分隔，必须使用空格的时候，用“\ ”或者“[:space:]”代替
 const paramsSep = params => {
 	if (!params) return [];
 	if (params.trim().length === 0) return [];
-	params = params.replace(/\\ /gi, '[:space:]');
 	params = params.split(/ +/);
-	params = params.map(p => p.replace(/\[:space:\]/gi, ' '));
 	return params;
 }
 
@@ -136,6 +142,8 @@ const param2String = p => {
 	q = '{' + q + '}';
 	return q;
 };
+const encodeEscape = line => line.replace(/\\ /g, '[:SPACE:]');
+const decodeEscape = line => line.replace(/\[:SPACE:\]/g, ' ');
 
 // 格式：<mparam>( <mparam>)*( [oparam])*( [...optionlist])?
 class Params {
@@ -220,6 +228,7 @@ class Params {
 	parse (params, helpMode) {
 		var result = {};
 		if (!(params instanceof Array)) params = paramsSep(params);
+		params = params.map(p => decodeEscape(p)); // 处理转义符
 		var len, index = 0, plen = params.length;
 		// 先解析必填参数
 		len = this.musts.length;
@@ -543,6 +552,7 @@ class Command {
 		}
 	}
 	parse (command) {
+		command = encodeEscape(command); // 特殊字符转义
 		if (command.substring(0, 9) !== '[global] ') command = '[global] ' + command;
 		var sepcmd = Object.keys(this.quests);
 		var cmds = [];
@@ -710,9 +720,10 @@ const GenerateHelp = (command, cmdlist, title) => {
 	}
 	selectCommands.map(q => {
 		if (Object.keys(scp).length > 0 && !scp[q.command]) return;
-		helpContent += Parser.Helper.quest(q, scp[q.command]) + '\n';
+		helpContent += Parser.Helper.quest(q, scp[q.command]);
 	});
 	if (cmdlist.length <= 1) {
+		helpContent += '\n';
 		helpContent += String.blank(HelpLayoutConfig.help) + String.blank(HelpLayoutConfig.right - HelpLayoutConfig.help, '=') + '\n';
 		helpContent += String.blank(HelpLayoutConfig.help) + setStyle('参数说明', 'bold') + '\n';
 		helpContent += String.blank(HelpLayoutConfig.help) + String.blank(HelpLayoutConfig.right - HelpLayoutConfig.help, '-') + '\n';
@@ -730,42 +741,62 @@ const GenerateHelp = (command, cmdlist, title) => {
 	return helpContent;
 };
 const GenerateQuestHelp = (quest, optlist) => {
-	var title = quest.command;
-	if (title === '[global]') title = 'default';
-	var line = setStyle(title, 'bold') + String.blank(HelpLayoutConfig.right - title.length) + quest.desc + '\n';
-	if (!!quest.alias && quest.alias.length > 0) line += String.blank(HelpLayoutConfig.lev1) + setStyle('别名：', 'bold') + String.blank(HelpLayoutConfig.lev2 - HelpLayoutConfig.lev1 - 6) + quest.alias.join(' | ') + '\n';
+	var title = quest.command, line;
+	if (title === '[global]') {
+		title = 'default';
+		quest.desc = quest.desc || '默认环境指令';
+	}
+	line = setStyle(title, 'bold');
+	if (!!quest.alias && quest.alias.length > 0) {
+		line += String.blank(HelpLayoutConfig.lev1 - getCLLength(title)) + setStyle('别名：', 'bold');
+		title = quest.alias.join(' | ');
+		line += String.blank(HelpLayoutConfig.lev2 - HelpLayoutConfig.lev1 - 6) + title;
+		line += String.blank(HelpLayoutConfig.right - HelpLayoutConfig.lev2 - getCLLength(title));
+	}
+	else {
+		line += String.blank(HelpLayoutConfig.right - title.length);
+	}
+	line += quest.desc + '\n';
 	var filterOption = !!optlist && optlist.length > 0;
 	if (!filterOption) {
+		title = '参数：';
 		if (quest.params.notEmpty) line += String.blank(HelpLayoutConfig.lev1) + setStyle('参数：', 'bold');
-		if (quest.params.musts.length > 0) {
-			quest.params.musts.map(p => {
-				line += '\n' + Parser.Helper.param(p, 0, quest.params.defaultValues[p], quest.params.valueRanges[p]);
-			});
-		}
-		if (quest.params.options.length > 0) {
-			quest.params.options.map(p => {
-				line += '\n' + Parser.Helper.param(p, 1, quest.params.defaultValues[p], quest.params.valueRanges[p]);
-			});
-		}
+		quest.params.musts.map(p => {
+			line += Parser.Helper.param(p, 0, quest.params.defaultValues[p], quest.params.valueRanges[p], 0, title) + '\n';
+			title = '';
+		});
+		quest.params.options.map(p => {
+			line += Parser.Helper.param(p, 1, quest.params.defaultValues[p], quest.params.valueRanges[p], 0, title) + '\n';
+			title = '';
+		});
 		if (!!quest.params.optionlist) {
-			line += '\n' + Parser.Helper.param(quest.params.optionlist, 2, quest.params.defaultValues[quest.params.optionlist], quest.params.valueRanges[quest.params.optionlist]);
+			line += Parser.Helper.param(quest.params.optionlist, 2, quest.params.defaultValues[quest.params.optionlist], quest.params.valueRanges[quest.params.optionlist], 0, title) + '\n';
 		}
-		if (quest.params.notEmpty) line += '\n';
 	}
-	if (quest.optionGroup.length > 0) line += String.blank(HelpLayoutConfig.lev1) + setStyle('开关：', 'bold') + '\n';
+	title = '开关：';
+	if (quest.optionGroup.length > 0) line += String.blank(HelpLayoutConfig.lev1) + setStyle(title, 'bold');
 	quest.optionGroup.map(opt => {
 		if (filterOption && optlist.indexOf(opt.name) < 0) {
 			return;
 		}
-		var questline = Parser.Helper.option(opt);
-		if (questline.length > 0) line += questline + '\n';
+		var questline = Parser.Helper.option(opt, title);
+		if (questline.length > 0) {
+			line += questline + '\n';
+			title = '';
+		}
 	});
 	return line;
 };
-const GenerateOptionHelp = option => {
-	var line = '';
-	var text = '--' + option.name;
-	line += String.blank(HelpLayoutConfig.lev2) + setStyle(text, 'bold');
+const GenerateOptionHelp = (option, prefix = '') => {
+	var line, text;
+	if (prefix.length > 0) {
+		line = String.blank(HelpLayoutConfig.lev2 - HelpLayoutConfig.lev1 - getCLLength(prefix));
+	}
+	else {
+		line = String.blank(HelpLayoutConfig.lev2);
+	}
+	text = '--' + option.name;
+	line += setStyle(text, 'bold');
 	if (!!option.short) {
 		text += ' | ' + '-' + option.short;
 		line += ' | ' + setStyle('-' + option.short, 'bold');
@@ -786,10 +817,28 @@ const GenerateOptionHelp = option => {
 	}
 	return line;
 };
-const GenerateParamHelp = (param, mode, defval, range, section) => {
-	var padding = HelpLayoutConfig.lev2;
-	if (section === 1) padding = HelpLayoutConfig.lev3;
-	var line = String.blank(padding);
+const GenerateParamHelp = (param, mode, defval, range, section, prefix = '') => {
+	var padding, line;
+	if (section === 1) {
+		if (prefix.length > 0) {
+			padding = HelpLayoutConfig.lev3 - HelpLayoutConfig.lev1 - getCLLength(prefix);
+			line = String.blank(padding);
+		}
+		else {
+			padding = HelpLayoutConfig.lev3;
+			line = String.blank(padding);
+		}
+	}
+	else {
+		if (prefix.length > 0) {
+			padding = HelpLayoutConfig.lev2 - HelpLayoutConfig.lev1 - getCLLength(prefix);
+			line = String.blank(padding);
+		}
+		else {
+			padding = HelpLayoutConfig.lev2;
+			line = String.blank(padding);
+		}
+	}
 	var title;
 	if (mode === 0) title = '<' + param + '>';
 	else if (mode === 2) title = '[...' + param + ']';
@@ -865,6 +914,10 @@ const paramGroupConvert = params => {
 	Object.defineProperty(convert, 'raw', { value: params });
 	return convert;
 };
+const exitProcess = async (cli, silence, leave) => {
+	await cli.close(silence);
+	if (leave) process.exit();
+};
 const Parser = config => {
 	var em = new EventEmitter();
 	var rl = {
@@ -888,6 +941,7 @@ const Parser = config => {
 	command.showPrefix = text => rl.hint(text);
 	command.showHint = text => rl.answer(text);
 	command.showError = text => rl.error(text);
+	command.cursor = (...args) => rl.cursor(...args);
 
 	command.parse = cmds => {
 		var helpMode = !!(' ' + cmds + ' ').match(/ (\-\-help|\-h) /);
@@ -919,37 +973,27 @@ const Parser = config => {
 			let args = process.argv.copy();
 			args.splice(0, 2);
 			args = args.join(' ');
-			// console.log(args);
 			command.parse(args);
 		}
 		if (config.mode === 'cli') {
 			rl = cli({
-				historySize: CommandHistorySize,
-				hints: hint
+				historySize: config.historySize || CommandHistorySize,
+				hints: hint,
+				history: config.historyStorage
 			})
 			.onRequest(cmd => {
 				var shortcmd = cmd.replace(/ +/g, ' ');
-				if (cmd === 'exit') {
-					rl.close();
-					process.exit();
-				}
-				else if (shortcmd === 'exit -s') {
-					rl.close(true);
-					process.exit();
-				}
-				else if (cmd === 'quit') {
-					rl.close();
-				}
-				else if (shortcmd === 'quit -s') {
-					rl.close(true);
-				}
+				if (cmd === 'exit') exitProcess(rl, false, true);
+				else if (shortcmd === 'exit -s') exitProcess(rl, true, true);
+				else if (cmd === 'quit') exitProcess(rl, false, false);
+				else if (shortcmd === 'quit -s') exitProcess(rl, true, false);
 				else {
-					if (cmd === 'help') cmd = '--help';
+					if (!!cmd.match(/^(help |help$)/)) cmd = '--' + cmd;
 					try {
 						let result = command.parse(cmd);
-						if (!result) return { msg: hint.no_such_command };
-						if (result.length <= 1 && result[0].quest === 'global' && result[0].params.length === 0) return { msg: hint.no_such_command };
-						return { nohint: result.nohint, msg: '' };
+						if (!result) return { msg: hint.no_such_command, norecord: true };
+						if (result.length <= 1 && result[0].quest === 'global' && result[0].params.length === 0) return { msg: hint.no_such_command, norecord: true };
+						return { nohint: !!result.nohint, msg: '', norecord: !!result.no_history };
 					}
 					catch (err) {
 						rl.error(err.message);
@@ -967,6 +1011,8 @@ const Parser = config => {
 				em.emit('exit', command);
 			});
 			command.cli = rl;
+			command.stopInput = () => rl.stopInput();
+			command.resumeInput = () => rl.resumeInput();
 
 			rl.answer('游戏开始喽~~~~');
 		}
@@ -977,6 +1023,11 @@ const Parser = config => {
 		if (!silence) showHint(hint.byebye);
 		rl.close();
 	};
+	Object.defineProperty(command, 'isInputStopped', {
+		configurable: false,
+		enumerable: true,
+		get: () => rl.isInputStopped || false
+	});
 	return command;
 };
 Parser.Params = Params;
@@ -989,6 +1040,7 @@ Parser.Helper = {
 	option: GenerateOptionHelp,
 	param: GenerateParamHelp
 };
+Parser.getCLLength = getCLLength;
 
 global.Utils = global.Utils || {};
 global.Utils.CLP = Parser;
