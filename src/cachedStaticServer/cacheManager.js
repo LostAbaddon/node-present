@@ -253,6 +253,7 @@ class ResourceManager extends global.Utils.EventManager {
 		});
 	}
 	async arrange () {
+		return;
 		console.time('Arrange');
 		var map = [];
 		Object.keys(this.storage).map(c => {
